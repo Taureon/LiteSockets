@@ -1,48 +1,58 @@
-let LiteSocket = LiteSocket || (() => {
+let //dumb fuck
 
-let webSocket = WebSocket || require('ws'),
+bitSize08   = 0b00000,
+bitSize16   = 0b01000,
+bitSize32   = 0b10000,
+bitSize64   = 0b11000,
 
-enumID = 0,
-enums = {
-    BigInt64: enumID++,
-    BigUint64: enumID++,
-    Float32: enumID++,
-    Float64: enumID++,
-    Int8: enumID++,
-    Int16: enumID++,
-    Int32: enumID++,
-    Uint8: enumID++,
-    Uint16: enumID++,
-    Uint32: enumID++,
-    Buffer8: enumID++,
-    Buffer16: enumID++,
-    Buffer32: enumID++,
-    Buffer64: enumID++,
-    String8: enumID++,
-    String16: enumID++,
-    String32: enumID++,
-    String64: enumID++
-}
+typeInt     = 0b00000,
+typeUint    = 0b00001,
+typeFloat   = 0b00010,
+typeBigInt  = 0b00011,
+typeBitUint = 0b00100,
+typeBuffer  = 0b00101,
+typeString  = 0b00110,
+
+dataTypes = {
+    BigInt64 : bitSize64 | typeBigInt ,
+    BigUint64: bitSite64 | typeBigUint,
+    Float32  : bitSize32 | typeFloat  ,
+    Float64  : bitSite64 | typeFloat  ,
+    Int8     : bitSize08 | typeInt    ,
+    Int16    : bitSize16 | typeInt    ,
+    Int32    : bitSize32 | typeInt    ,
+    Uint8    : bitSize08 | typeUint   ,
+    Uint16   : bitSize16 | typeUint   ,
+    Uint32   : bitSize32 | typeUint   ,
+    Buffer8  : bitSize08 | typeBuffer ,
+    Buffer16 : bitSize16 | typeBuffer ,
+    Buffer32 : bitSize32 | typeBuffer ,
+    Buffer64 : bitSite64 | typeBuffer ,
+    String8  : bitSize08 | typeString ,
+    String16 : bitSize16 | typeString ,
+    String32 : bitSize32 | typeString ,
+    String64 : bitSite64 | typeString
+},
 
 dataSizes = {
-    BigInt64: 8n,
-    BigUint64: 8n,
-    Float32: 4n,
-    Float64: 8n,
-    Int8: 1n,
-    Int16: 2n,
-    Int32: 4n,
-    Uint8: 1n,
-    Uint16: 2n,
-    Uint32: 4n,
-    Buffer8: 1n,
-    Buffer16: 2n,
-    Buffer32: 4n,
-    Buffer64: 8n, //no one is going to use Buffer64 or String64 but fuck it why not?
-    String8: 1n,
-    String16: 2n,
-    String32: 4n,
-    String64: 8n
+    [dataTypes.BigInt64]: 8n,
+    [dataTypes.BigUint64]: 8n,
+    [dataTypes.Float32]: 4n,
+    [dataTypes.Float64]: 8n,
+    [dataTypes.Int8]: 1n,
+    [dataTypes.Int16]: 2n,
+    [dataTypes.Int32]: 4n,
+    [dataTypes.Uint8]: 1n,
+    [dataTypes.Uint16]: 2n,
+    [dataTypes.Uint32]: 4n,
+    [dataTypes.Buffer8]: 1n,
+    [dataTypes.Buffer16]: 2n,
+    [dataTypes.Buffer32]: 4n,
+    [dataTypes.Buffer64]: 8n, //no one is going to use Buffer64 or String64 but fuck it why not?
+    [dataTypes.String8]: 1n,
+    [dataTypes.String16]: 2n,
+    [dataTypes.String32]: 4n,
+    [dataTypes.String64]: 8n
 },
 
 dataSizeTypes = Object.keys(dataSizes),
@@ -186,9 +196,9 @@ sortSubObjs = obj => {
     return ret;
 },
 
-isBuffer = buffer => Buffer ? Buffer.isBuffer(buffer) : buffer instanceof Uint8Array;
+isBuffer = buffer => Buffer ? Buffer.isBuffer(buffer) : buffer instanceof Uint8Array,
 
-let EventEmitter = require ? require('events') : class {
+EventEmitter = class {
     constructor() {
         this.callbacks = {};
     }
@@ -201,26 +211,34 @@ let EventEmitter = require ? require('events') : class {
     }
 };
 
-class LiteSocketError extends Error { constructor(error) { super('LiteSocket Error: ' + error); } }
-
-webSocket.WebSocketServer = webSocket.WebSocketServer || class { constructor() { throw new LiteSocketError('Cannot start a server in a Browser enviroment!'); } };
+class LiteSocketError extends Error {
+    constructor(error) {
+        super('LiteSocket Error: ' + error);
+    }
+}
 
 class LiteSocketClient extends EventEmitter {
     constructor(args) {
         super();
         this.valueChecking = args.valueChecking || true;
-        if (this.valueChecking) validateArgs(args, clientKeys, serverKeys, true);
+        if (this.valueChecking) {
+            validateArgs(args, clientKeys, serverKeys, true);
+        }
 
         let clientKeys = getKeysSorted(args.clientPackages),
             serverKeys = getKeysSorted(args.serverPackages);
 
         this.clientPackages = sortSubObjs(args.clientPackages);
         this.clientPackagesID = {};
-        for (let i = 0; i < clientKeys.length; i++) this.clientPackagesID[clientKeys[i]] = i;
+        for (let i = 0; i < clientKeys.length; i++) {
+            this.clientPackagesID[clientKeys[i]] = i;
+        }
 
         this.serverPackages = sortSubObjs(args.serverPackages);
         this.serverPackagesID = {};
-        for (let i = 0; i < serverKeys.length; i++) this.serverPackagesID[i] = serverKeys[i];
+        for (let i = 0; i < serverKeys.length; i++) {
+            this.serverPackagesID[i] = serverKeys[i];
+        }
 
         //this.encryptionAlgorithm = args.encryptionAlgorithm || false;
         //this.encryptionKey = args.encryptionKey;
@@ -252,7 +270,9 @@ class LiteSocketClient extends EventEmitter {
 
     send(type, data) {
         //TODO: ADD CHECKSUM AND ENCRYPTION
-        if (this.canSendMessages()) sendBuffer(bufferfyPackage(type, data, this.clientPackages, this.clientPackagesID, true, this.valueChecking));
+        if (this.canSendMessages()) {
+            sendBuffer(bufferfyPackage(type, data, this.clientPackages, this.clientPackagesID, true, this.valueChecking));
+        }
     }
 
     close(code, reason) {
@@ -260,73 +280,5 @@ class LiteSocketClient extends EventEmitter {
     }
 }
 
-class SocketWrap extends EventEmitter {
-    constructor (wsSocket, lsServer) {
-        super();
-        this.socket = wsSocket;
-        this.server = lsServer;
-        wsSocket.on('message', msg => {
-            //TODO: ADD DECRYPTION AND CHECKSUM
-
-            let package = new Uint8Array(msg.data);
-            this.emit(this.clientPackagesID[package[0]], parsePackage(this.clientPackages[type], package.slice(1)));
-        });
-        wsSocket.on('close', event => this.emit('close', event));
-    }
-
-    send(type, data) {
-        //TODO: ADD CHECKSUM AND ENCRYPTION
-        this.socket.send(bufferfyPackage(type, data, this.server.serverPackages, this.server.serverPackagesID, false, this.server.valueChecking));
-    }
-    
-    close() {
-        this.socket.close();
-    }
-}
-
-class LiteSocketServer extends EventEmitter {
-    constructor(args) {
-        super();
-        this.valueChecking = args.valueChecking || true;
-        if (this.valueChecking) validateArgs(args, clientKeys, serverKeys, false);
-
-        let clientKeys = getKeysSorted(args.clientPackages),
-            serverKeys = getKeysSorted(args.serverPackages);
-
-        this.clientPackages = sortSubObjs(args.clientPackages);
-        this.clientPackagesID = {};
-        for (let i = 0; i < clientKeys.length; i++) this.clientPackagesID[clientKeys[i]] = i;
-
-        this.serverPackages = sortSubObjs(args.serverPackages);
-        this.serverPackagesID = {};
-        for (let i = 0; i < serverKeys.length; i++) this.serverPackagesID[i] = serverKeys[i];
-
-        this.options = args.options;
-        //this.encryptionAlgorithm = args.encryptionAlgorithm || false;
-        //this.encryptionKey = args.encryptionKey;
-        this.sockets = [];
-        this.server = new webSocket.WebSocketServer(this.options);
-        this.server.on('connection', socket => {
-            socket = new SocketWrap(socket, this);
-            this.socket.push(socket);
-            this.emit('connection', req, socket, head);
-        });
-        this.server.on('error', event => this.emit('error', event));
-    }
-
-    listen(...args) {
-        this.server.listen(...args);
-    }
-}
-
-return {
-    Client: LiteSocketClient,
-    Server: LiteSocketServer,
-    validatePackage,
-    bufferfyPackage,
-    parsePackage
-};
-
-if (undefined != module?.exports) module.exports = LiteSocket;
-
-})();
+//TODO: add required stuff
+export { Client: LiteSocketClient, DataTypes: dataTypes };

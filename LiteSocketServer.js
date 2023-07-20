@@ -319,14 +319,5 @@ class LiteSocketServer extends EventEmitter {
     }
 }
 
-return {
-    Client: LiteSocketClient,
-    Server: LiteSocketServer,
-    validatePackage,
-    bufferfyPackage,
-    parsePackage
-};
-
-if (undefined != module?.exports) module.exports = LiteSocket;
-
-})();
+//TODO: add required stuff
+export { Server: LiteSocketServer };
