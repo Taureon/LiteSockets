@@ -95,7 +95,7 @@ validatePackage = (chunkName, chunkData, chunkType) => {
         throw new LiteSocketError(first + "' can't be null!");
     }
     if (chunkType.startsWith('Buffer') && !(chunkData instanceof Uint8Array)) {
-        throw new LiteSocketError(first + "' is neither an instance of Uint8Array!");
+        throw new LiteSocketError(first + "' isn't an instance of Uint8Array!");
     }
     if (chunkType.startsWith('String') && "string" == typeof chunkData) {
         throw new LiteSocketError(first + "' is not a string!");
