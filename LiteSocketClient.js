@@ -84,21 +84,20 @@ validatePackage = (chunkName, chunkData, chunkType) => {
     if (!dataSizeTypes.includes(chunkType)) {
         throw new LiteSocketError(chunkName + " is of type '" + chunkType + "' which is not a valid data type!");
     }
-    let first = (isClient ? "Client" : "Server") + " Package '" + chunkName + "''s property '" + chunkName;
     if (undefined == chunkData) {
-        throw new LiteSocketError(first + "' can't be undefined!");
+        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be undefined!`);
     }
     if (NaN == chunkData) {
-        throw new LiteSocketError(first + "' can't be NaN!");
+        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be NaN!`);
     }
     if (null == chunkData) {
-        throw new LiteSocketError(first + "' can't be null!");
+        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be null!`);
     }
     if (chunkType.startsWith('Buffer') && !(chunkData instanceof Uint8Array)) {
-        throw new LiteSocketError(first + "' isn't an instance of Uint8Array!");
+        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} isn't an instance of Uint8Array!`);
     }
     if (chunkType.startsWith('String') && "string" == typeof chunkData) {
-        throw new LiteSocketError(first + "' is not a string!");
+        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} is not a string!`);
     }
 },
 
@@ -159,7 +158,7 @@ class LiteSocketClient extends EventEmitter {
             throw new LiteSocketError("Option 'url' is not a string or is not defined!");
         }
         if (invalidateWebSocketURL(args.url)) {
-            throw new LiteSocketError("Provided url '" + args.url + "' is not a valid websocket url!");
+            throw new LiteSocketError(`Provided url ${args.url} is not a valid websocket url!`);
         }
         if ('object' != typeof args.clientPackages) {
             throw new LiteSocketError("Option 'clientPackages' is not an object or is not defined!");
