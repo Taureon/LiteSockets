@@ -1,3 +1,4 @@
+/* jshint esversion: 11 */
 let webSocket = WebSocket || require('ws'),
 
 bitSize08   = 0b00000,
@@ -9,15 +10,15 @@ typeInt     = 0b00000,
 typeUint    = 0b00001,
 typeFloat   = 0b00010,
 typeBigInt  = 0b00011,
-typeBitUint = 0b00100,
+typeBigUint = 0b00100,
 typeBuffer  = 0b00101,
 typeString  = 0b00110,
 
 dataTypes = {
     BigInt64 : bitSize64 | typeBigInt ,
-    BigUint64: bitSite64 | typeBigUint,
+    BigUint64: bitSize64 | typeBigUint,
     Float32  : bitSize32 | typeFloat  ,
-    Float64  : bitSite64 | typeFloat  ,
+    Float64  : bitSize64 | typeFloat  ,
     Int08    : bitSize08 | typeInt    ,
     Int16    : bitSize16 | typeInt    ,
     Int32    : bitSize32 | typeInt    ,
@@ -27,11 +28,11 @@ dataTypes = {
     Buffer08 : bitSize08 | typeBuffer ,
     Buffer16 : bitSize16 | typeBuffer ,
     Buffer32 : bitSize32 | typeBuffer ,
-    Buffer64 : bitSite64 | typeBuffer ,
+    Buffer64 : bitSize64 | typeBuffer ,
     String08 : bitSize08 | typeString ,
     String16 : bitSize16 | typeString ,
     String32 : bitSize32 | typeString ,
-    String64 : bitSite64 | typeString
+    String64 : bitSize64 | typeString
 },
 
 dataSizes = {
@@ -81,7 +82,7 @@ invalidateWebSocketURL = url => {
 
 validatePackage = (chunkName, chunkData, chunkType) => {
     if (!dataSizeTypes.includes(chunkType)) {
-        throw new LiteSocketError(chunkName + " is of type '" + chunkType + "' which is not a valid data type!")
+        throw new LiteSocketError(chunkName + " is of type '" + chunkType + "' which is not a valid data type!");
     }
     let first = (isClient ? "Client" : "Server") + " Package '" + chunkName + "''s property '" + chunkName;
     if (undefined == chunkData) {
@@ -106,13 +107,17 @@ getKeysSorted = x => Object.keys(x).sort(),
 
 sortKeys = obj => {
     let ret = {};
-    for (let key of getKeysSorted(obj)) ret[key] = obj[key];
+    for (let key of getKeysSorted(obj)) {
+        ret[key] = obj[key];
+    }
     return ret;
 },
 
 sortSubObjs = obj => {
     let ret = {};
-    for (let key of obj) ret[key] = sortKeys(obj[key]);
+    for (let key of obj) {
+        ret[key] = sortKeys(obj[key]);
+    }
     return ret;
 },
 
@@ -170,15 +175,15 @@ class LiteSocketClient extends EventEmitter {
             serverKeys = getKeysSorted(args.serverPackages);
 
         this.clientPackages = sortSubObjs(args.clientPackages);
-        this.clientPackagesID = {};
+        this.clientPackagesToIndex = {};
         for (let i = 0; i < clientKeys.length; i++) {
-            this.clientPackagesID[i] = clientKeys[i];
+            this.clientPackagesToIndex[clientKeys[i]] = i;
         }
 
         this.serverPackages = sortSubObjs(args.serverPackages);
-        this.serverPackagesID = {};
+        this.serverPackagesToKey = {};
         for (let i = 0; i < serverKeys.length; i++) {
-            this.serverPackagesID[i] = serverKeys[i];
+            this.serverPackagesToKey[i] = serverKeys[i];
         }
 
         this.useEncryption = args.useEncryption;
@@ -192,51 +197,65 @@ class LiteSocketClient extends EventEmitter {
         this.socket.binaryType = 'arraybuffer';
         this.socket.onopen = event => this.emit('open', event);
         this.socket.onmessage = msg => {
-            //TODO: ADD DECRYPTION AND CHECKSUM
 
-            let package = new Uint8Array(msg.data),
-                  = this.serverPackagesID[package[0]],
-                data = this.parsePackage(this.serverPackages[type], package.slice(1));
+            let message = new Uint8Array(msg.data);
+
+            if (this.useEncryption) {
+                message = this.decrypt(message);
+            }
+
+            let type = this.serverPackagesToKey[message[0]],
+                data = this.parsePackage(type, message.slice(1));
+
             this.emit(type, data);
-        }
+        };
         this.socket.onerror = event => this.emit('error', event);
-        this.socket.onclose = closeEvent => this.emit('close', closeEvent);
+        this.socket.onclose = event => this.emit('close', event);
     }
 
-    parsePackage (infos, data) {
+    parsePackage (type, data) {
         let dataView = new DataView(data),
+            specs = this.serverPackages[type],
             parsed = {},
             offset = 0n;
-        for (let label in infos) {
-            let type = infos[label],
+        for (let label in specs) {
+            let type = specs[label],
                 typeLength = dataSizes[type],
                 isString = type & typeString;
 
             if (isString || type & typeBuffer) {
 
                 //figure out how long the buffer is
-                let i, finalLength = 0n;
-                for (i = offset; i < offset + typeLength; i++) finalLength = finalLength << 8n + BigInt(dataView.getUint8(i));
+                let finalLength = 0n;
+                for (let i = offset; i < offset + typeLength; i++) {
+                    finalLength = finalLength << 8n + BigInt(dataView.getUint8(i));
+                }
 
-                //get the entire buffer
-                let arr = new Uint8Array(parseInt(finalLength));
-                for (let j = 0; j < finalLength; j++) arr[j] = data[i + j];
+                //actually get the buffer
+                let start = parseInt(offset += typeLength),
+                    end = parseInt(offset += finalLength),
+                    buff = data.slice(start, end);
 
                 //decode buffer if its string data and save it
-                parsed[label] = isString ? textDecoder.decode(arr) : arr;
-                offset += typeLength + finalLength;
+                parsed[label] = isString ? textDecoder.decode(buff) : buff;
 
             //handle normal data
             } else {
                 parsed[label] = dataView[typeToDataViewMethod(type)](parseInt(offset));
                 offset += typeLength;
             }
+
+            //someone is forging packets, probably
+            //or we just screwed up somewhere int he bufferfying process on the other side
+            if (offset > data.length) {
+                throw LiteSocketError("Suspicious packet processing error.");
+            }
         }
         return parsed;
-    },
+    }
 
     bufferfyPackage (type, data) {
-        let buffs = [new Uint8Array([this.clientPackagesID[type]])],
+        let buffs = [new Uint8Array([this.clientPackagesToIndex[type]])],
             packageSpecs = this.clientPackages[type];
 
         for (let name in packageSpecs) {
@@ -283,20 +302,29 @@ class LiteSocketClient extends EventEmitter {
         return buffer;
     }
 
+    decrypt (buffer) {
+        //TODO: ADD DECRYPTION AND SUMCHECK
+        return buffer;
+    }
+
     canSendMessages () {
         return this.socket.readyState == webSocket.OPEN;
     }
 
     sendBuffer (msg) {
-        if (this.canSendMessages()) this.socket.send(msg);
+        if (this.canSendMessages()) {
+            this.socket.send(msg);
+        }
     }
 
     send (type, data) {
         if (!this.canSendMessages()) return;
 
-        let buffer = this.bufferfyPackage(type, data)
+        let buffer = this.bufferfyPackage(type, data);
 
-        if (this.useEncryption) buffer = this.encrypt(buffer);
+        if (this.useEncryption) {
+            buffer = this.encrypt(buffer);
+        }
 
         sendBuffer(buffer);
     }
@@ -306,5 +334,7 @@ class LiteSocketClient extends EventEmitter {
     }
 }
 
-//TODO: add required stuff
-export { Client: LiteSocketClient, DataTypes: dataTypes };
+export {
+    Client: LiteSocketClient,
+    DataTypes: dataTypes
+};
