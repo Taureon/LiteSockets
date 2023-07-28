@@ -66,8 +66,6 @@ typeToString = {
     [typeUint]: 'Uint',
 },
 
-dataSizeTypes = Object.keys(dataSizes),
-
 textDecoder = new TextDecoder(),
 textEncoder = new TextEncoder(),
 
@@ -81,8 +79,8 @@ invalidateWebSocketURL = url => {
 },
 
 validatePackage = (chunkName, chunkData, chunkType) => {
-    if (!dataSizeTypes.includes(chunkType)) {
-        throw new LiteSocketError(chunkName + " is of type '" + chunkType + "' which is not a valid data type!");
+    if (!(chunkType in dataSizes)) {
+        throw new LiteSocketError(`${chunkName} is of type ${chunkType} which is not a valid data type!`);
     }
     if (undefined == chunkData) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be undefined!`);
@@ -93,10 +91,10 @@ validatePackage = (chunkName, chunkData, chunkType) => {
     if (null == chunkData) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be null!`);
     }
-    if (chunkType.startsWith('Buffer') && !(chunkData instanceof Uint8Array)) {
+    if (chunkType & typeBuffer && !(chunkData instanceof Uint8Array)) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} isn't an instance of Uint8Array!`);
     }
-    if (chunkType.startsWith('String') && "string" == typeof chunkData) {
+    if (chunkType & typeString && "string" == typeof chunkData) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} is not a string!`);
     }
 },
