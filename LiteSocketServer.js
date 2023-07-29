@@ -1,12 +1,14 @@
 /* jshint esversion: 11 */
-let webSocket = require('ws'),
+let { WebSocketServer } = require('ws'),
     EventEmitter = require('events'),
 
+bitsizemask = 0b11000,
 bitSize08   = 0b00000,
 bitSize16   = 0b01000,
 bitSize32   = 0b10000,
 bitSize64   = 0b11000,
 
+typemask    = 0b00111,
 typeInt     = 0b00000,
 typeUint    = 0b00001,
 typeFloat   = 0b00010,
@@ -70,15 +72,6 @@ typeToString = {
 textDecoder = new TextDecoder(),
 textEncoder = new TextEncoder(),
 
-invalidateWebSocketURL = url => {
-    try {
-        url = new URL(url);
-        return url.protocol != 'ws' && url.protocol != 'wss';
-    } catch (err) {
-        return true;
-    }
-},
-
 validatePackage = (chunkName, chunkData, chunkType) => {
     if (!(chunkType in dataSizes)) {
         throw new LiteSocketError(`${chunkName} is of type ${chunkType} which is not a valid data type!`);
@@ -121,7 +114,7 @@ sortSubObjs = obj => {
 
 typeToDataViewMethod = (type, isSet) => {
     for (let key of typeToString) {
-        if (type & 0b111 === key) {
+        if (type & typemask === key) {
             return (isSet ? 'set' : 'get') + typeToString[key];
         }
     }
@@ -152,17 +145,14 @@ class SocketWrap extends EventEmitter {
         super();
         this.socket = wsSocket;
         this.server = lsServer;
-    }
 
-    connect () {
-        this.socket = new webSocket(this.url);
         this.socket.binaryType = 'arraybuffer';
         this.socket.onopen = event => this.emit('open', event);
         this.socket.onmessage = msg => {
 
             let message = new Uint8Array(msg.data);
 
-            if (this.useEncryption) {
+            if (this.server.useEncryption) {
                 message = this.decrypt(message);
             }
 
@@ -274,7 +264,7 @@ class SocketWrap extends EventEmitter {
 
         let buffer = this.bufferfyPackage(type, data);
 
-        if (this.useEncryption) {
+        if (this.server.useEncryption) {
             buffer = this.encrypt(buffer);
         }
 
@@ -332,7 +322,7 @@ class LiteSocketServer extends EventEmitter {
 
         this.options = args.options;
         this.sockets = [];
-        this.server = new webSocket.WebSocketServer(this.options);
+        this.server = new WebSocketServer(this.options);
         this.server.on('connection', socket => {
             socket = new SocketWrap(socket, this);
             this.sockets.push(socket);
