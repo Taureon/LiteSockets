@@ -85,7 +85,7 @@ validatePackage = (chunkName, chunkData, chunkType) => {
     if (undefined == chunkData) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be undefined!`);
     }
-    if (NaN == chunkData) {
+    if (isNaN(chunkData)) {
         throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be NaN!`);
     }
     if (null == chunkData) {

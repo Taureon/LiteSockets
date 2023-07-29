@@ -84,19 +84,19 @@ validatePackage = (chunkName, chunkData, chunkType) => {
         throw new LiteSocketError(`${chunkName} is of type ${chunkType} which is not a valid data type!`);
     }
     if (undefined == chunkData) {
-        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be undefined!`);
+        throw new LiteSocketError(`Server Package ${chunkName}'s property ${chunkName} can't be undefined!`);
     }
-    if (NaN == chunkData) {
-        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be NaN!`);
+    if (isNaN(chunkData)) {
+        throw new LiteSocketError(`Server Package ${chunkName}'s property ${chunkName} can't be NaN!`);
     }
     if (null == chunkData) {
-        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} can't be null!`);
+        throw new LiteSocketError(`Server Package ${chunkName}'s property ${chunkName} can't be null!`);
     }
     if (chunkType & typeBuffer && !(chunkData instanceof Uint8Array)) {
-        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} isn't an instance of Uint8Array!`);
+        throw new LiteSocketError(`Server Package ${chunkName}'s property ${chunkName} isn't an instance of Uint8Array!`);
     }
     if (chunkType & typeString && "string" == typeof chunkData) {
-        throw new LiteSocketError(`Client Package ${chunkName}'s property ${chunkName} is not a string!`);
+        throw new LiteSocketError(`Server Package ${chunkName}'s property ${chunkName} is not a string!`);
     }
 },
 
@@ -303,7 +303,7 @@ class LiteSocketServer extends EventEmitter {
             throw new LiteSocketError("Option 'encryptionKey' is not an instance of CryptoKey!");
         }
         if ('object' != typeof args.options) {
-            throw new LiteSocketError("Option 'options' is not an object");
+            throw new LiteSocketError("Option 'options' is not an object!");
         }
         if (('port' in args.options) + ('server' in args.options) + ('noServer' in args.options) === 1) {
             throw new LiteSocketError("Option 'options' must have one and only one of the following options specified:" +
