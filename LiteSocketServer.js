@@ -147,9 +147,8 @@ class SocketWrap extends EventEmitter {
         this.server = lsServer;
 
         this.socket.binaryType = 'arraybuffer';
-        this.socket.onopen = event => this.emit('open', event);
-        this.socket.onmessage = msg => {
-
+        this.socket.on('open', event => this.emit('open', event));
+        this.socket.on('message', msg => {
             let message = new Uint8Array(msg.data);
 
             if (this.server.useEncryption) {
@@ -160,9 +159,9 @@ class SocketWrap extends EventEmitter {
                 data = this.parsePackage(type, message.slice(1));
 
             this.emit(type, data);
-        };
-        this.socket.onerror = event => this.emit('error', event);
-        this.socket.onclose = event => this.emit('close', event);
+        });
+        this.socket.on('error', event => this.emit('error', event));
+        this.socket.on('close', event => this.emit('close', event));
     }
 
     parsePackage (type, data) {
@@ -326,14 +325,15 @@ class LiteSocketServer extends EventEmitter {
         this.server.on('connection', socket => {
             socket = new SocketWrap(socket, this);
             this.sockets.push(socket);
-            socket.on('close', () => {});
+            socket.on('close', () => {
+                let i = this.sockets.indexOf(socket);
+                if (i > -1) {
+                    array.splice(i, 1);
+                }
+            });
             this.emit('connection', req, socket, head);
         });
         this.server.on('error', event => this.emit('error', event));
-    }
-
-    listen(...args) {
-        this.server.listen(...args);
     }
 }
 
