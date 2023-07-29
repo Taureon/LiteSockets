@@ -304,18 +304,8 @@ class LiteSocketClient extends EventEmitter {
         return buffer;
     }
 
-    canSendMessages () {
-        return this.socket.readyState == webSocket.OPEN;
-    }
-
-    sendBuffer (msg) {
-        if (this.canSendMessages()) {
-            this.socket.send(msg);
-        }
-    }
-
     send (type, data) {
-        if (!this.canSendMessages()) return;
+        if (this.socket.readyState !== webSocket.OPEN) return;
 
         let buffer = this.bufferfyPackage(type, data);
 
@@ -323,7 +313,7 @@ class LiteSocketClient extends EventEmitter {
             buffer = this.encrypt(buffer);
         }
 
-        sendBuffer(buffer);
+        this.socket.send(buffer);
     }
 
     close (code, reason) {
