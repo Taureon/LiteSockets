@@ -1,6 +1,6 @@
 import { Client as LSClient, DataTypes as LSDataTypes } from "LiteSocketClient.js";
 
-    //packages the client sends to the server
+// Packages, that the Client sends to the Server
 let clientPackages = {
         message: {
             content: LSDataTypes.String8
@@ -11,14 +11,13 @@ let clientPackages = {
         }
     },
 
-    //packages the server sends to the client
+    // Packages, that the Server sends to the Client
     serverPackages = {
         status: {
             playerCount: LSDataTypes.Int16,
             motd: LSDataTypes.String32
         },
         message: {
-            id: LSDataTypes.Int32,
             name: LSDataTypes.String8,
             content: LSDataTypes.String8
         },
@@ -28,14 +27,20 @@ let clientPackages = {
         }
     },
 
+    // Create new client that connects with 'wss://example.com/'
     client = new LSClient({
         url: 'wss://example.com/',
         serverPackages,
         clientPackages
     });
 
+// We have connected, so we have to open chat and immediately send a message
 client.on('open', event => {
     openChat();
+
+    client.send('message', {
+        content: 'This is an example message!'
+    });
 });
 
 client.on('status', status => {
@@ -45,7 +50,7 @@ client.on('status', status => {
 });
 
 client.on('message', message => {
-    console.log(`message received!\n${message.name}\n${message.content}\n${message.id}`)
+    console.log(`message received!\n${message.name}\n${message.content}`)
     addMessageToChat(message);
 });
 
@@ -56,10 +61,6 @@ client.on('download', download => {
 
 client.on('close', event => {
     closeChat();
-});
-
-client.send('message', {
-    content: 'This is an example message!'
 });
 
 fileUpload.addEventListener('dragenter', event => event.preventDefault());
@@ -73,8 +74,8 @@ fileUpload.addEventListener('drop', event => {
             client.send('upload', {
                 filename: file.name,
                 filedata: buffer
-                // you can also do this:
-                //filedata: new TextEncoder().encode('This is a text file!')
+                // You can also do this:
+                // filedata: new TextEncoder().encode('This is a text file!')
             });
         });
     }

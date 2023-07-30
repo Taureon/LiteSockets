@@ -50,7 +50,7 @@ dataSizes = {
     [dataTypes.Uint16]: 2n,
     [dataTypes.Uint32]: 4n,
 
-    //for Buffer and String, the size refers to how large the length header is
+    // For Buffer and String, the size refers to how large the length header is
     [dataTypes.Buffer08]: 1n,
     [dataTypes.Buffer16]: 2n,
     [dataTypes.Buffer32]: 4n,
@@ -93,7 +93,6 @@ validatePackage = (chunkName, chunkData, chunkType) => {
     }
 },
 
-//i hate seeing Object.keys() and .sort() being used in code so i made this function to hide them
 getKeysSorted = x => Object.keys(x).sort(),
 
 sortKeys = obj => {
@@ -176,28 +175,28 @@ class SocketWrap extends EventEmitter {
 
             if (isString || type & typeBuffer) {
 
-                //figure out how long the buffer is
+                // Figure out how long the buffer is
                 let finalLength = 0n;
                 for (let i = offset; i < offset + typeLength; i++) {
                     finalLength = finalLength << 8n + BigInt(dataView.getUint8(i));
                 }
 
-                //actually get the buffer
+                // Actually get the buffer
                 let start = parseInt(offset += typeLength),
                     end = parseInt(offset += finalLength),
                     buff = data.slice(start, end);
 
-                //decode buffer if its string data and save it
+                // Decode buffer if its string data and save it
                 parsed[label] = isString ? textDecoder.decode(buff) : buff;
 
-            //handle normal data
+            // Handle normal data
             } else {
                 parsed[label] = dataView[typeToDataViewMethod(type)](parseInt(offset));
                 offset += typeLength;
             }
 
-            //someone is forging packets, probably
-            //or we just screwed up somewhere in the bufferfying process on the other side
+            // Someone is forging packets, probably
+            // Or we just screwed up somewhere in the bufferfying process on the other side
             if (offset > data.length) {
                 throw LiteSocketError("Suspicious packet processing error.");
             }
@@ -219,13 +218,13 @@ class SocketWrap extends EventEmitter {
 
             if (isString || type & typeBuffer) {
 
-                //decode buffer if its string data and save it
+                // Decode buffer if it is string data
                 chunkData = isString ? textEncoder.encode(chunkData) : chunkData;
                 buffs.push(new Uint8Array([chunkData.length]));
 
                 buffs.push(appendBuff);
 
-            //handle normal data
+            // Handle data that DataView already has tools for
             } else {
                 let appendBuff = new Uint8Array(typeLength);
                 new DataView(appendBuff)[typeToDataViewMethod(type, true)](0, chunkData);
@@ -234,7 +233,7 @@ class SocketWrap extends EventEmitter {
 
         }
 
-        //merge all buffers into one
+        // Merge all buffers into one
         let resultLength = 0;
         for (let buff of buffs) {
             resultLength += buff.length;
@@ -249,12 +248,12 @@ class SocketWrap extends EventEmitter {
     }
 
     encrypt (buffer) {
-        //TODO: ADD CHECKSUM AND ENCRYPTION
+        // TODO: ADD CHECKSUM AND ENCRYPTION
         return buffer;
     }
 
     decrypt (buffer) {
-        //TODO: ADD DECRYPTION AND SUMCHECK
+        // TODO: ADD DECRYPTION AND SUMCHECK
         return buffer;
     }
 
