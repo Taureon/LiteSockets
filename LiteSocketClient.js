@@ -243,7 +243,7 @@ class LiteSocketClient extends EventEmitter {
             }
 
             //someone is forging packets, probably
-            //or we just screwed up somewhere int he bufferfying process on the other side
+            //or we just screwed up somewhere in the bufferfying process on the other side
             if (offset > data.length) {
                 throw LiteSocketError("Suspicious packet processing error.");
             }

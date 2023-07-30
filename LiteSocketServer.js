@@ -197,7 +197,7 @@ class SocketWrap extends EventEmitter {
             }
 
             //someone is forging packets, probably
-            //or we just screwed up somewhere int he bufferfying process on the other side
+            //or we just screwed up somewhere in the bufferfying process on the other side
             if (offset > data.length) {
                 throw LiteSocketError("Suspicious packet processing error.");
             }
@@ -334,6 +334,14 @@ class LiteSocketServer extends EventEmitter {
             this.emit('connection', req, socket, head);
         });
         this.server.on('error', event => this.emit('error', event));
+    }
+
+    broadcast (type, data, filter = socket => true) {
+        for (let i = 0; i < this.sockets.length; i++) {
+            if (filter(this.sockets[i])) {
+                this.sockets[i].send(type, data);
+            }
+        }
     }
 }
 
