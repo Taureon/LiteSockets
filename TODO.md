@@ -1,5 +1,9 @@
 # Things to add:
 
+- Bitmaps.
+  - Some data types require less than 8 bits to store.
+  - Bitmaps could be used to compress multiple things into fewer bytes, reducing the amount of bandwidth wasted.
+
 - Packet Joining.
   - Instead of sending many small packets, the server/client can just send one large packet that has the small packets in it.
   - They can just be joined on the sender and the receiver would have to figure out what the packets were.
