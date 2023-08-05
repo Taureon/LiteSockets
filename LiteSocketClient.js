@@ -324,7 +324,7 @@ let exportObj = {
     Client: LiteSocketClient,
     DataTypes: dataTypes
 };
-if (module) {
+if (typeof module != "undefined") {
     module.exports = exportObj;
 } else {
     window.LiteSockets = exportObj;
