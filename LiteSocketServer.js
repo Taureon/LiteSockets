@@ -344,7 +344,8 @@ class LiteSocketServer extends EventEmitter {
     }
 }
 
-export {
-    Server: LiteSocketServer,
-    DataTypes: dataTypes
-};
+if (module) {
+    module.exports = { Server: LiteSocketServer, DataTypes: dataTypes };
+} else {
+    throw new LiteSocketError('Where are you trying to run this server in? This was made for Node.js');
+}

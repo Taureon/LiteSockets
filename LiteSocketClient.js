@@ -320,7 +320,12 @@ class LiteSocketClient extends EventEmitter {
     }
 }
 
-export {
+let exportObj = {
     Client: LiteSocketClient,
     DataTypes: dataTypes
 };
+if (module) {
+    module.exports = exportObj;
+} else {
+    window.LiteSockets = exportObj;
+}
