@@ -41,4 +41,12 @@ class Walker {
 	String16 () { return this.nextString(this.nextUint16()); }
 	String32 () { return this.nextString(this.nextUint32()); }
 	String64 () { return this.nextString(this.nextBigUint64()); }
+
+	// typed arrays
+
+	// multidimensional arrays
+
+	// custom object arrays
+
+	// parse with format
 }
