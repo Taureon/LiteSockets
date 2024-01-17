@@ -51,7 +51,7 @@ class Walker {
 	Array32 (type, argument) { return this.Array(type, this.Uint32(), argument); }
 	Array64 (type, argument) { return this.Array(type, this.BigUint64(), argument); }
 
-	BufferRemaining () { return this.buffer.slice(this.index, this.buffer.length); }
+	BufferRemaining () { return this.buffer.slice(this.Index(length - this.index), this.index); }
 	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
 
 	ArrayRemaining (type, argument) {
