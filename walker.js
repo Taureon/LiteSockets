@@ -1,6 +1,4 @@
-let ERR_PAST_BUFFER_LENGTH = 0,
-
-textDecoder = new TextDecoder();
+let textDecoder = new TextDecoder();
 
 class Walker {
 	constructor (buffer) {
@@ -8,45 +6,58 @@ class Walker {
 		this.dataView = new DataView(buffer);
 		this.index = 0;
 	}
-	nextIndex (n) {
+	Index (n) {
+		let toWalk = parseInt(n);
+		if (isNaN(toWalk)) throw new Error(`Trying to walk a non-integer amount!\nto walk: ${toWalk}`);
 		let old = this.index;
-		if (this.index += n >= this.buffer.length) throw new Error("Walker walked past the buffer length!");
+		if (this.index += toWalk >= this.buffer.length) throw new Error('Walked past the buffer length!');
 		return old;
 	}
 
-	nextBigInt64 () { return this.dataView.getBigInt64(this.nextIndex(8)); }
-	nextBigUint64 () { return this.dataView.getBigUint64(this.nextIndex(8)); }
-	nextFloat32 () { return this.dataView.getFloat32(this.nextIndex(4)); }
-	nextFloat64 () { return this.dataView.getFloat64(this.nextIndex(8)); }
-	nextInt8 () { return this.dataView.getInt8(this.nextIndex(1)); }
-	nextInt16 () { return this.dataView.getInt16(this.nextIndex(2)); }
-	nextInt32 () { return this.dataView.getInt32(this.nextIndex(4)); }
-	nextUint8 () { return this.dataView.getUint8(this.nextIndex(1)); }
-	nextUint16 () { return this.dataView.getUint16(this.nextIndex(2)); }
-	nextUint32 () { return this.dataView.getUint32(this.nextIndex(4)); }
+	BigInt64 () { return this.dataView.getBigInt64(this.Index(8)); }
+	BigUint64 () { return this.dataView.getBigUint64(this.Index(8)); }
+	Float32 () { return this.dataView.getFloat32(this.Index(4)); }
+	Float64 () { return this.dataView.getFloat64(this.Index(8)); }
+	Int8 () { return this.dataView.getInt8(this.Index(1)); }
+	Int16 () { return this.dataView.getInt16(this.Index(2)); }
+	Int32 () { return this.dataView.getInt32(this.Index(4)); }
+	Uint8 () { return this.dataView.getUint8(this.Index(1)); }
+	Uint16 () { return this.dataView.getUint16(this.Index(2)); }
+	Uint32 () { return this.dataView.getUint32(this.Index(4)); }
 
-	nextBuffer (length) {
-		let start = this.index;
-		this.nextIndex(length);
-		return this.buffer.slice(start, this.index);
+	Buffer (length) { return this.buffer.slice(this.Index(length), this.index); }
+	String (length) { return textDecoder.decode(this.Buffer(length)); }
+
+	Buffer8 () { return this.Buffer(this.Uint8()); }
+	Buffer16 () { return this.Buffer(this.Uint16()); }
+	Buffer32 () { return this.Buffer(this.Uint32()); }
+	Buffer64 () { return this.Buffer(this.BigUint64()); }
+	String8 () { return this.String(this.Uint8()); }
+	String16 () { return this.String(this.Uint16()); }
+	String32 () { return this.String(this.Uint32()); }
+	String64 () { return this.String(this.BigUint64()); }
+
+	Array (type, length, argument) {
+		if ('number' != typeof length || length < 0) throw new Error(`Invalid length in array!\nlength: ${length}`);
+		if ('function' == typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
+		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
+		let array = [];
+		while (length--) array.push(this[type](...argument));
+		return array;
 	}
 
-	nextString (length) { return textDecoder.decode(this.nextBuffer(length)); }
+	Array8 (type, argument) { return this.Array(type, this.Uint8(), argument); }
+	Array16 (type, argument) { return this.Array(type, this.Uint16(), argument); }
+	Array32 (type, argument) { return this.Array(type, this.Uint32(), argument); }
+	Array64 (type, argument) { return this.Array(type, this.BigUint64(), argument); }
 
-	Buffer8 () { return this.nextBuffer(this.nextUint8()); }
-	Buffer16 () { return this.nextBuffer(this.nextUint16()); }
-	Buffer32 () { return this.nextBuffer(this.nextUint32()); }
-	Buffer64 () { return this.nextBuffer(this.nextBigUint64()); }
-	String8 () { return this.nextString(this.nextUint8()); }
-	String16 () { return this.nextString(this.nextUint16()); }
-	String32 () { return this.nextString(this.nextUint32()); }
-	String64 () { return this.nextString(this.nextBigUint64()); }
-
-	// typed arrays
-
-	// multidimensional arrays
-
-	// custom object arrays
-
-	// parse with format
+	Struct (struct) {
+		let result = {};
+		for (let [key, type, ...argument] of struct) {
+			if ('function' == typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
+			if (this[type].length && !argument) throw new Error(`Missing argument in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
+			result[key] = this[type](...argument);
+		}
+		return result;
+	}
 }
