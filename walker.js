@@ -10,7 +10,7 @@ class Walker {
 		let toWalk = parseInt(n);
 		if (isNaN(toWalk)) throw new Error(`Trying to walk a non-integer amount!\nto walk: ${toWalk}`);
 		let old = this.index;
-		if (this.index += toWalk >= this.buffer.length) throw new Error('Walked past the buffer length!');
+		if (this.index += toWalk > this.buffer.length) throw new Error('Walked past the buffer length!');
 		return old;
 	}
 
@@ -50,6 +50,17 @@ class Walker {
 	Array16 (type, argument) { return this.Array(type, this.Uint16(), argument); }
 	Array32 (type, argument) { return this.Array(type, this.Uint32(), argument); }
 	Array64 (type, argument) { return this.Array(type, this.BigUint64(), argument); }
+
+	BufferRemaining () { return this.buffer.slice(this.index, this.buffer.length); }
+	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
+
+	ArrayRemaining (type, argument) {
+		if ('function' == typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
+		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
+		let array = [];
+		while (this.index < this.buffer.length) array.push(this[type](...argument));
+		return array;
+	}
 
 	Struct (struct) {
 		let result = {};
