@@ -1,6 +1,6 @@
 let textEncoder = new TextEncoder();
 
-class Builder {
+class Constructor {
 	constructor () {
 		this.data = [];
 	}
@@ -29,7 +29,7 @@ class Builder {
 	String64 (string) { this.Buffer64(textEncoder.encode(string)); }
 
 	Array (array, type) {
-		if ('function' == typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
+		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
 		for (let item of array) this[type](item, ...argument);
 	}
@@ -41,7 +41,7 @@ class Builder {
 
 	Struct (object, struct) {
 		for (let [key, type, ...argument] of struct) {
-			if ('function' == typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
+			if ('function' != typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
 			if (this[type].length && !argument) throw new Error(`Missing argument in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
 			this[type](object[key], ...argument);
 		}

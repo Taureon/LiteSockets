@@ -39,7 +39,7 @@ class Walker {
 
 	Array (type, length, argument) {
 		if ('number' != typeof length || length < 0) throw new Error(`Invalid length in array!\nlength: ${length}`);
-		if ('function' == typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
+		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
 		let array = [];
 		while (length--) array.push(this[type](...argument));
@@ -55,7 +55,7 @@ class Walker {
 	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
 
 	ArrayRemaining (type, argument) {
-		if ('function' == typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
+		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
 		let array = [];
 		while (this.index < this.buffer.length) array.push(this[type](...argument));
@@ -65,7 +65,7 @@ class Walker {
 	Struct (struct) {
 		let result = {};
 		for (let [key, type, ...argument] of struct) {
-			if ('function' == typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
+			if ('function' != typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
 			if (this[type].length && !argument) throw new Error(`Missing argument in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
 			result[key] = this[type](...argument);
 		}
