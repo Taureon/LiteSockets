@@ -84,7 +84,7 @@ console.log("passed simple array test");
 
 // complicated arrays
 
-console.log("\n doing complicated array test");
+console.log("\ndoing complicated array test");
 
 let items = [{
 	name: "Air",
