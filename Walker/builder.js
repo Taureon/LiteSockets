@@ -78,10 +78,8 @@ class Builder {
 
 		let final = new Uint8Array(buffers.reduce((a, b) => a + b.byteLength, 0)),
 			i = 0;
-		//console.log(buffers.map(b => b.buffer));
 		for (let buffer of buffers) {
 			final.set(buffer, i);
-			console.log(final.buffer);
 			i += buffer.byteLength;
 		}
 		return final;
