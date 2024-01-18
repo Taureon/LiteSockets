@@ -88,6 +88,7 @@ console.log("\n doing complicated array test");
 
 let items = Array(Math.ceil(Math.random() * 10)).fill(x => {
 	let item = {};
+	// TODO: generate test items
 	return item;
 }).map(x => x());
 
@@ -102,3 +103,14 @@ structure = [
 		["maxDuration", "Uint16"]
 	]]
 ];
+
+builder = new Builder();
+builder.Array8(items, "Struct", structure);
+
+result = builder.finish();
+console.log("finished:", hexifyArray(result));
+
+reader = new Reader(result.buffer);
+assert.deepStrictEqual(items, reader.Array8("Struct", structure));
+
+console.log("passed complicated array test");
