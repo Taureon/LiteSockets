@@ -1,6 +1,6 @@
 let textDecoder = new TextDecoder();
 
-class Walker {
+class Reader {
 	constructor (buffer) {
 		this.buffer = buffer;
 		this.dataView = new DataView(buffer);
@@ -72,3 +72,5 @@ class Walker {
 		return result;
 	}
 }
+
+module.exports = Reader;

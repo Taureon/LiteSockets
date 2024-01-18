@@ -1,6 +1,19 @@
-let textEncoder = new TextEncoder();
+let textEncoder = new TextEncoder(),
 
-class Constructor {
+typeToArrayConstructor = {
+	BigInt64: BigInt64Array,
+	BigUint64: BigUint64Array,
+	Float32: Float32Array,
+	Float64: Float64Array,
+	Int8: Int8Array,
+	Int16: Int16Array,
+	Int32: Int32Array,
+	Uint8: Uint8Array,
+	Uint16: Uint16Array,
+	Uint32: Uint32Array
+};
+
+class Builder {
 	constructor () {
 		this.data = [];
 	}
@@ -51,53 +64,28 @@ class Constructor {
 		let buffers = [];
 		for (let [type, data] of this.data) {
 			let buffer;
-			switch (type) {
-				case 'BigInt64':
-					buffer = new BigInt64Array(1);
-					break;
-				case 'BigUint64':
-					buffer = new BigUint64Array(1);
-					break;
-				case 'Float32':
-					buffer = new Float32Array(1);
-					break;
-				case 'Float64':
-					buffer = new Float64Array(1);
-					break;
-				case 'Int8':
-					buffer = new Int8Array(1);
-					break;
-				case 'Int16':
-					buffer = new Int16Array(1);
-					break;
-				case 'Int32':
-					buffer = new Int32Array(1);
-					break;
-				case 'Uint8':
-					buffer = new Uint8Array(1);
-					break;
-				case 'Uint16':
-					buffer = new Uint16Array(1);
-					break;
-				case 'Uint32':
-					buffer = new Uint32Array(1);
-					break;
-				case 'Buffer':
-					buffer = data;
-					break;
-				default:
-					throw new Error('Unknown type: ' + type);
+			if (type in typeToArrayConstructor) {
+				buffer = new typeToArrayConstructor[type](1);
+				let dataView = new DataView(buffer.buffer);
+				dataView['set' + type](0, data);
+			} else if (type == 'Buffer') {
+				buffer = data;
+			} else {
+				throw new Error('Unknown type: ' + type);
 			}
-			if (type != 'Buffer') buffer.set(data);
 			buffers.push(buffer);
 		}
 
-		let final = new ArrayBuffer(buffers.reduce((a, b) => a + b.byteLength, 0)),
+		let final = new Uint8Array(buffers.reduce((a, b) => a + b.byteLength, 0)),
 			i = 0;
+		//console.log(buffers.map(b => b.buffer));
 		for (let buffer of buffers) {
 			final.set(buffer, i);
+			console.log(final.buffer);
 			i += buffer.byteLength;
 		}
 		return final;
 	}
 }
+
+module.exports = Builder;
