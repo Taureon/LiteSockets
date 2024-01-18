@@ -47,10 +47,10 @@ class Builder {
 		for (let item of array) this[type](item, ...argument);
 	}
 
-	Array8 (array, type) { this.Int8(array.length); this.Array(array, type); }
-	Array16 (array, type) { this.Int16(array.length); this.Array(array, type); }
-	Array32 (array, type) { this.Int32(array.length); this.Array(array, type); }
-	Array64 (array, type) { this.BigInt64(BigInt(array.length)); this.Array(array, type); }
+	Array8 (array, type, ...argument) { this.Int8(array.length); this.Array(array, type, ...argument); }
+	Array16 (array, type, ...argument) { this.Int16(array.length); this.Array(array, type, ...argument); }
+	Array32 (array, type, ...argument) { this.Int32(array.length); this.Array(array, type, ...argument); }
+	Array64 (array, type, ...argument) { this.BigInt64(BigInt(array.length)); this.Array(array, type, ...argument); }
 
 	Struct (object, struct) {
 		for (let [key, type, ...argument] of struct) {

@@ -17,7 +17,7 @@ let player = {
 console.log("\ntest entity", { player });
 console.log(numToHex(player.health, 2), ',' , numToHex(player.maxHealth, 2), ',' , numToHex(textEncoder.encode(player.name).length), ',' , hexifyArray(textEncoder.encode(player.name)));
 
-//direct set/get of properties
+// direct set/get of properties
 
 console.log("\ndoing direct set/get test");
 
@@ -38,7 +38,7 @@ console.log("passed direct set/get test");
 
 
 
-//using structs
+// using structs
 
 console.log("\ndoing struct test");
 
@@ -61,7 +61,7 @@ console.log("passed struct test");
 
 
 
-//simple arrays
+// simple arrays
 
 console.log("\ndoing simple array test");
 
@@ -79,3 +79,26 @@ reader = new Reader(result.buffer);
 assert.deepStrictEqual(someData, reader.Array8("Uint8"));
 
 console.log("passed simple array test");
+
+
+
+// complicated arrays
+
+console.log("\n doing complicated array test");
+
+let items = Array(Math.ceil(Math.random() * 10)).fill(x => {
+	let item = {};
+	return item;
+}).map(x => x());
+
+structure = [
+	["name", "String8"],
+	["description", "String16"],
+	["amount", "Uint32"],
+	["maxAmount", "Uint32"],
+	["effects", "Array16", "Struct", [
+		["effectId", "Uint8"],
+		["duration", "Uint16"],
+		["maxDuration", "Uint16"]
+	]]
+];
