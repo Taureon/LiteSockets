@@ -10,7 +10,8 @@ class Reader {
 		let toWalk = parseInt(n);
 		if (isNaN(toWalk)) throw new Error(`Trying to walk a non-integer amount!\nto walk: ${toWalk}`);
 		let old = this.index;
-		if (this.index += toWalk > this.buffer.length) throw new Error('Walked past the buffer length!');
+		this.index += toWalk;
+		if (this.index > this.buffer.length) throw new Error('Walked past the buffer length!');
 		return old;
 	}
 
