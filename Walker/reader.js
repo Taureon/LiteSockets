@@ -38,7 +38,7 @@ class Reader {
 	String32 () { return this.String(this.Uint32()); }
 	String64 () { return this.String(this.BigUint64()); }
 
-	Array (type, length, argument) {
+	Array (type, length, ...argument) {
 		if ('number' != typeof length || length < 0) throw new Error(`Invalid length in array!\nlength: ${length}`);
 		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
@@ -47,10 +47,10 @@ class Reader {
 		return array;
 	}
 
-	Array8 (type, argument) { return this.Array(type, this.Uint8(), argument); }
-	Array16 (type, argument) { return this.Array(type, this.Uint16(), argument); }
-	Array32 (type, argument) { return this.Array(type, this.Uint32(), argument); }
-	Array64 (type, argument) { return this.Array(type, this.BigUint64(), argument); }
+	Array8 (type, ...argument) { return this.Array(type, this.Uint8(), ...argument); }
+	Array16 (type, ...argument) { return this.Array(type, this.Uint16(), ...argument); }
+	Array32 (type, ...argument) { return this.Array(type, this.Uint32(), ...argument); }
+	Array64 (type, ...argument) { return this.Array(type, this.BigUint64(), ...argument); }
 
 	BufferRemaining () { return this.buffer.slice(this.Index(length - this.index), this.index); }
 	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
@@ -74,4 +74,5 @@ class Reader {
 	}
 }
 
-module.exports = Reader;
+if (typeof module !== 'undefined') module.exports = Reader;
+else window.Reader = Reader;

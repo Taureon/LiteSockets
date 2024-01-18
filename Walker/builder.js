@@ -41,7 +41,7 @@ class Builder {
 	String32 (string) { this.Buffer32(textEncoder.encode(string)); }
 	String64 (string) { this.Buffer64(textEncoder.encode(string)); }
 
-	Array (array, type) {
+	Array (array, type, ...argument) {
 		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
 		for (let item of array) this[type](item, ...argument);
@@ -86,4 +86,5 @@ class Builder {
 	}
 }
 
-module.exports = Builder;
+if (typeof module !== 'undefined') module.exports = Builder;
+else window.Builder = Builder;
