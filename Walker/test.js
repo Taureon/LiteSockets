@@ -3,8 +3,9 @@ let assert = require('assert'),
 Builder = require('./builder'),
 Reader = require('./reader');
 
-let numToHex = (num, bytes = 1) => num.toString(16).padStart(2 * bytes, '0'),
-textEncoder = new TextEncoder();
+let numToHex = (num, bytes = 1) => '0x' + num.toString(16).padStart(2 * bytes, '0'),
+	hexifyArray = array => Array.from(array).map(x => numToHex(x)).join(' '),
+	textEncoder = new TextEncoder();
 
 
 
@@ -13,8 +14,8 @@ let player = {
 	maxHealth: 500 * Math.ceil(Math.random() * 20),
 	name: "Cowardius"
 };
-console.log("test entity", { player });
-console.log(numToHex(player.health, 2), ',' , numToHex(player.maxHealth, 2), ',' , numToHex(textEncoder.encode(player.name).length), ',' , Array.from(textEncoder.encode(player.name)).map(x => numToHex(x)).join(' '));
+console.log("\ntest entity", { player });
+console.log(numToHex(player.health, 2), ',' , numToHex(player.maxHealth, 2), ',' , numToHex(textEncoder.encode(player.name).length), ',' , hexifyArray(textEncoder.encode(player.name)));
 
 //direct set/get of properties
 
@@ -26,7 +27,7 @@ builder.Int16(player.maxHealth);
 builder.String8(player.name);
 
 let result = builder.finish();
-console.log("finished:", Array.from(result).map(x => numToHex(x)).join(' '));
+console.log("finished:", hexifyArray(result));
 
 let reader = new Reader(result.buffer);
 assert.equal(reader.Int16(), player.health);
@@ -51,7 +52,7 @@ builder = new Builder();
 builder.Struct(player, structure);
 
 result = builder.finish();
-console.log("finished:", Array.from(result).map(x => numToHex(x)).join(' '));
+console.log("finished:", hexifyArray(result));
 
 reader = new Reader(result.buffer);
 assert.deepStrictEqual(player, reader.Struct(structure));
@@ -65,14 +66,14 @@ console.log("passed struct test");
 console.log("\ndoing simple array test");
 
 let someData = Array(Math.ceil(Math.random() * 40)).fill(256).map(x => Math.floor(Math.random() * x));
-console.log("test data:", someData.map(x => numToHex(x)).join(' '));
+console.log("test data:", hexifyArray(someData));
 console.log("length:", numToHex(someData.length));
 
 builder = new Builder();
 builder.Array8(someData, "Uint8");
 
 result = builder.finish();
-console.log("finished:", Array.from(result).map(x => x.toString(16).padStart(2, '0')).join(' '));
+console.log("finished:", hexifyArray(result));
 
 reader = new Reader(result.buffer);
 assert.deepStrictEqual(someData, reader.Array8("Uint8"));
