@@ -97,11 +97,7 @@ let items = [{
 	description: "Heals you over time",
 	amount: 5,
 	maxAmount: 20,
-	effects: [{
-		effectId: 30,
-		duration: 18,
-		maxDuration: 25
-	}]
+	effects: [{ effectId: 30, duration: 18, maxDuration: 25 }]
 }, {
 	name: "Rock",
 	description: "Can be thrown",
@@ -113,29 +109,17 @@ let items = [{
 	description: "Makes you very strong!",
 	amount: 1,
 	maxAmount: 3,
-	effects: [{
-		effectId: 10,
-		duration: 15,
-		maxDuration: 20
-	},{
-		effectId: 14,
-		duration: 15,
-		maxDuration: 20
-	},{
-		effectId: 15,
-		duration: 15,
-		maxDuration: 20
-	}]
+	effects: [
+		{ effectId: 10, duration: 15, maxDuration: 20 },
+		{ effectId: 14, duration: 15, maxDuration: 20 },
+		{ effectId: 15, duration: 15, maxDuration: 20 }
+	]
 }, {
 	name: "Insta-Health",
 	description: "Heals you immediately",
 	amount: 3,
 	maxAmount: 10,
-	effects: [{
-		effectId: 41,
-		duration: 1,
-		maxDuration: 1
-	}]
+	effects: [{ effectId: 41, duration: 1, maxDuration: 1 }]
 }];
 
 structure = [
