@@ -86,11 +86,57 @@ console.log("passed simple array test");
 
 console.log("\n doing complicated array test");
 
-let items = Array(Math.ceil(Math.random() * 10)).fill(x => {
-	let item = {};
-	// TODO: generate test items
-	return item;
-}).map(x => x());
+let items = [{
+	name: "Air",
+	description: "does nothing",
+	amount: 1000,
+	maxAmount: 1000,
+	effects: []
+}, {
+	name: "Regeneration Potion",
+	description: "Heals you over time",
+	amount: 5,
+	maxAmount: 20,
+	effects: [{
+		effectId: 30,
+		duration: 18,
+		maxDuration: 25
+	}]
+}, {
+	name: "Rock",
+	description: "Can be thrown",
+	amount: 74,
+	maxAmount: 100,
+	effects: []
+}, {
+	name: "Giant",
+	description: "Makes you very strong!",
+	amount: 1,
+	maxAmount: 3,
+	effects: [{
+		effectId: 10,
+		duration: 15,
+		maxDuration: 20
+	},{
+		effectId: 14,
+		duration: 15,
+		maxDuration: 20
+	},{
+		effectId: 15,
+		duration: 15,
+		maxDuration: 20
+	}]
+}, {
+	name: "Insta-Health",
+	description: "Heals you immediately",
+	amount: 3,
+	maxAmount: 10,
+	effects: [{
+		effectId: 41,
+		duration: 1,
+		maxDuration: 1
+	}]
+}];
 
 structure = [
 	["name", "String8"],
