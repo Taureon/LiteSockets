@@ -1,15 +1,23 @@
 ## function arguments
-### length (Reader only): Integer
+
+### length: Integer
 How many bytes (`Buffer()`), characters (`String()`) or items (`Array()`) to read.
+
 ### type: String
 What kind of data to expect. (`Float32`, `String16`, `Array8`, etc...)
+
 ### ...argument: String/Integer
-TODO: add description
+The arguments if you were calling the aforementioned `type` as a function.
+
 ### struct: Array\<structEntry>
 An array of `structEntry`s, which is an Array that is formatted like this:
-`[ propertyName , type (, extra) ]`
-`extra`: Depends on `type`. Most don't need extra, but here is a list for those who do:
 
+`[ propertyName , type (, ...extra) ]`
+
+`extra`: Depends on `type`. Most don't need extra, but here is a list for those who do:
+- `Struct`: A `struct`.
+- `Array[N]`: Another `type` followed by `...argument`.
+- `Array`: Same as `Array[N]`, but with a `length` between the second `type` and `...argument`.
 
 # Reader
 ### .BigInt64 ( ): BigInt
