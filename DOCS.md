@@ -4,15 +4,13 @@
 How many bytes (`Buffer()`), characters (`String()`) or items (`Array()`) to read.
 
 ### type: String
-What kind of data to expect. (`Float32`, `String16`, `Array8`, etc...)
+What kind of data to expect. (`Float32`, `String16`, `Array`, etc...)
 
 ### ...argument: String/Integer
 The arguments if you were calling the aforementioned `type` as a function.
 
 ### struct: Array\<structEntry>
-An array of `structEntry`s, which is an Array that is formatted like this:
-
-`[ propertyName , type (, ...extra) ]`
+An array of `structEntry`s, which is an Array that is formatted like this: `[ propertyName , type (, ...extra) ]`
 
 `extra`: Depends on `type`. Most don't need extra, but here is a list for those who do:
 - `Struct`: A `struct`.
