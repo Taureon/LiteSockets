@@ -55,7 +55,7 @@ class Reader {
 	BufferRemaining () { return this.buffer.slice(this.Index(length - this.index), this.index); }
 	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
 
-	ArrayRemaining (type, argument) {
+	ArrayRemaining (type, ...argument) {
 		if ('function' != typeof this[type]) throw new Error(`Nonexistant type in array!\ntype: ${type}`);
 		if (this[type].length && argument == null) throw new Error(`Missing argument in array!\ntype: ${type}`);
 		let array = [];
