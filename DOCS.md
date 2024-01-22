@@ -18,6 +18,8 @@ An array of `structEntry`s, which is an Array that is formatted like this: `[ pr
 - `Array`: Same as `Array[N]`, but with a `length` between the second `type` and `...argument`.
 
 # Reader
+The following methods assume the immediate next piece of information is equal to the method name and returns it.
+
 ### .BigInt64 ( ): BigInt
 ### .BigUint64 ( ): BigInt
 ### .Float32 ( ): Number
@@ -49,6 +51,8 @@ An array of `structEntry`s, which is an Array that is formatted like this: `[ pr
 ### .Struct ( struct ): Object
 
 # Writer
+The following methods add data to an internal queue which then get turned into a single buffer when the `.finish()` method is called.
+
 ### .BigInt64 ( bitInt )
 ### .BigUint64 ( bigUint )
 ### .Float32 ( float )
@@ -75,5 +79,6 @@ An array of `structEntry`s, which is an Array that is formatted like this: `[ pr
 ### .Array32 ( array, type, ...argument )
 ### .Array64 ( array, type, ...argument )
 ### .Struct ( object, struct )
-### .finish ( ): Uint8Array
-Builds the complete buffer with the data that was given before using the other functions.
+
+## .finish ( ): Uint8Array
+Builds the buffer from the queue and returns it.
