@@ -48,7 +48,7 @@ The following methods assume the immediate next piece of information is equal to
 `.BufferRemaining` ( ): `Buffer`\
 `.StringRemaining` ( ): `String`\
 `.ArrayRemaining` ( `type`, `...argument` ) : `Array`\
-`.Struct` ( `struct` ): `Object`\
+`.Struct` ( `struct` ): `Object`
 
 # Writer
 The following methods add data to an internal queue which then get turned into a single buffer when the `.finish()` method is called.
