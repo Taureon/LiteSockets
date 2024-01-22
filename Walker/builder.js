@@ -18,7 +18,7 @@ class Builder {
 		this.data = [];
 	}
 
-	BigInt64 (bitInt) { this.data.push(["BigInt64", bitInt]); }
+	BigInt64 (bigInt) { this.data.push(["BigInt64", bigInt]); }
 	BigUint64 (bigUint) { this.data.push(["BigUint64", bigUint]); }
 	Float32 (float) { this.data.push(["Float32", float]); }
 	Float64 (float) { this.data.push(["Float64", float]); }
