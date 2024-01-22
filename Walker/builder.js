@@ -56,6 +56,7 @@ class Builder {
 		for (let [key, type, ...argument] of struct) {
 			if ('function' != typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
 			if (this[type].length && !argument) throw new Error(`Missing argument in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
+			if (!(key in object)) throw new Error(`Missing property in object!\nmissing property: ${key}\nexpected type: ${type}`);
 			this[type](object[key], ...argument);
 		}
 	}

@@ -1,38 +1,38 @@
-import { Server as LSServer, DataTypes as LSDataTypes } from "LiteSocketServer.js";
+import { Server as LSServer } from "LiteSocketServer.js";
 
 // Packages, that the Client sends to the Server
 let clientPackages = {
-        message: {
-            content: LSDataTypes.String8
-        },
-        upload: {
-            filename: LSDataTypes.String8,
-            filedata: LSDataTypes.Buffer32
-        }
+    message: {
+        content: 'String8'
     },
+    upload: {
+        filename: 'String8',
+        filedata: 'Buffer32'
+    }
+},
 
-    // Packages, that the Server sends to the Client
-    serverPackages = {
-        status: {
-            playerCount: LSDataTypes.Int16,
-            motd: LSDataTypes.String32
-        },
-        message: {
-            name: LSDataTypes.String8,
-            content: LSDataTypes.String8
-        },
-        download: {
-            filename: LSDataTypes.String8,
-            filedata: LSDataTypes.Buffer32
-        }
+// Packages, that the Server sends to the Client
+serverPackages = {
+    status: {
+        playerCount: 'Int16',
+        motd: 'String32'
     },
+    message: {
+        name: 'String8',
+        content: 'String8'
+    },
+    download: {
+        filename: 'String8',
+        filedata: 'Buffer32'
+    }
+},
 
-    // Creates a new server on port 8080
-    server = new LSClient({
-        options: { port: 8080 },
-        serverPackages,
-        clientPackages
-    });
+// Creates a new server on port 8080
+server = new LSClient({
+    options: { port: 8080 },
+    serverPackages,
+    clientPackages
+});
 
 // Someone has connected! Let's let them join the chat room!
 server.on('connection', (req, socket) => {
@@ -76,16 +76,16 @@ server.on('connection', (req, socket) => {
     });
 });
 
-// Time difference formatting code: https://stackoverflow.com/a/26580696/10793061
 const bootup = Date.now(),
-    format = x => x.toString().length == 1 ? '0' + x : x;
+    format = x => Math.floor(x).toString().padStart(2, '0');
 
 // Update server status once a second
 setInterval(() => {
-    let secs = (Date.now() - bootup) / 1000 | 0,
-        timestring = `${format(secs / 3600 | 0)} hours, ${format((secs % 3600) / 60 | 0)} minutes and ${format(secs % 60)} seconds`;
+    let secs = (Date.now() - bootup) / 1000,
+        mins = secs / 60,
+        hours = mins / 60,
+        timestring = `${format(hours)} hours, ${format(mins % 60)} minutes and ${format(secs % 60)} seconds`;
 
-    // Sometimes, I find chats which don't display how many people are currently connected, which makes me sad :(
     server.broadcast('status', {
         playerCount: server.sockets.length,
         motd: `Running for ${timestring}!`

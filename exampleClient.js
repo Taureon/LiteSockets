@@ -1,29 +1,29 @@
-import { Client as LSClient, DataTypes as LSDataTypes } from "LiteSocketClient.js";
+import { Client as LSClient } from "LiteSocketClient.js";
 
 // Packages, that the Client sends to the Server
 let clientPackages = {
         message: {
-            content: LSDataTypes.String8
+            content: 'String8'
         },
         upload: {
-            filename: LSDataTypes.String8,
-            filedata: LSDataTypes.Buffer32
+            filename: 'String8',
+            filedata: 'Buffer32'
         }
     },
 
     // Packages, that the Server sends to the Client
     serverPackages = {
         status: {
-            playerCount: LSDataTypes.Int16,
-            motd: LSDataTypes.String32
+            playerCount: 'Int16',
+            motd: 'String32'
         },
         message: {
-            name: LSDataTypes.String8,
-            content: LSDataTypes.String8
+            name: 'String8',
+            content: 'String8'
         },
         download: {
-            filename: LSDataTypes.String8,
-            filedata: LSDataTypes.Buffer32
+            filename: 'String8',
+            filedata: 'Buffer32'
         }
     },
 
