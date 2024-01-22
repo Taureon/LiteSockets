@@ -19,7 +19,9 @@ Most don't need `...extra`, but here is a list for the `type`s who do:
 - `Array`: Same as `Array[N]`, but with a `length` between the second `type` and `...argument`.
 
 # Reader
-The following methods assume the immediate next piece of information is equal to the method name and returns it.
+This constructor takes in an `ArrayBuffer` as its first and only argument.
+
+The following methods return the immediate next piece of information as if it were that data type.
 
 `.BigInt64` ( ): `BigInt`\
 `.BigUint64` ( ): `BigInt`\
@@ -52,7 +54,9 @@ The following methods assume the immediate next piece of information is equal to
 `.Struct` ( `struct` ): `Object`
 
 # Writer
-The following methods add data to an internal queue which then get turned into a single buffer when the `.finish()` method is called.
+This constructor takes in no arguments.
+
+The following methods add data to an internal queue.
 
 `.BigInt64` ( `bigInt` )\
 `.BigUint64` ( `bigUint` )\
@@ -79,6 +83,7 @@ The following methods add data to an internal queue which then get turned into a
 `.Array16` ( `array`, `type`, `...argument` )\
 `.Array32` ( `array`, `type`, `...argument` )\
 `.Array64` ( `array`, `type`, `...argument` )\
-`.Struct` ( `object`, `struct` )\
+`.Struct` ( `object`, `struct` )
+
 `.finish` ( ): `Uint8Array`\
-Builds the buffer from the queue and returns it.
+Builds a buffer from the queue and returns it.
