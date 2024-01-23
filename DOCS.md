@@ -19,6 +19,7 @@ Most don't need `...extra`, but here is a list for the `type`s who do:
 - `Struct`: A `struct`.
 - `Array[N]`\*: Another `type` followed by `...argument`.
 - `Array`: Same as `Array[N]`\*, but with a `length` between the second `type` and `...argument`.
+
 \* Array\[N\] = Array8, Array16, Array32 or Array64
 
 # Reader
