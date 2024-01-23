@@ -33,7 +33,7 @@ The following methods return the immediate next piece of information as if it we
 `.Uint8` ( ): `Number`\
 `.Uint16` ( ): `Number`\
 `.Uint32` ( ): `Number`\
-`.Buffer` ( `length` `)`\
+`.Buffer` ( `length` ): `Buffer`\
 `.Buffer8` ( ): `Buffer`\
 `.Buffer16` ( ): `Buffer`\
 `.Buffer32` ( ): `Buffer`\
