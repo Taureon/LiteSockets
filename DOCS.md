@@ -47,14 +47,14 @@ The following methods return the immediate next piece of information as if it we
 `.String16` ( ): `String`\
 `.String32` ( ): `String`\
 `.String64` ( ): `String`\
-`.Array` ( `type`, `length`, `...argument` ) : `Array`\
-`.Array8` ( `type`, `...argument` ) : `Array`\
-`.Array16` ( `type`, `...argument` ) : `Array`\
-`.Array32` ( `type`, `...argument` ) : `Array`\
-`.Array64` ( `type`, `...argument` ) : `Array`\
+`.Array` ( `type`, `length`, `...argument` ): `Array`\
+`.Array8` ( `type`, `...argument` ): `Array`\
+`.Array16` ( `type`, `...argument` ): `Array`\
+`.Array32` ( `type`, `...argument` ): `Array`\
+`.Array64` ( `type`, `...argument` ): `Array`\
 `.BufferRemaining` ( ): `Buffer`\
 `.StringRemaining` ( ): `String`\
-`.ArrayRemaining` ( `type`, `...argument` ) : `Array`\
+`.ArrayRemaining` ( `type`, `...argument` ): `Array`\
 `.Struct` ( `struct` ): `Object`
 
 # Writer
