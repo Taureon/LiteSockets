@@ -12,6 +12,8 @@ The arguments if you were calling the aforementioned `type` as a function.
 `struct`: `Array<structEntry>`\
 An array of `structEntry`s, which is an Array that is formatted like this: `[ propertyName , type (, ...extra) ]`
 
+`propertyName`: A string of what you want this property to be called.\
+`type`: A string of what data type this property is.
 `...extra`: Depends on `type`.\
 Most don't need `...extra`, but here is a list for the `type`s who do:
 - `Struct`: A `struct`.
