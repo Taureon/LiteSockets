@@ -322,6 +322,8 @@ class LiteSocketClient extends EventEmitter {
 
 if (typeof module != "undefined") {
     module.exports = { Client };
+} else if (window.LiteSockets) {
+    window.LiteSockets.Client = Client;
 } else {
     window.LiteSockets = { Client };
 }

@@ -114,6 +114,8 @@ class Agent extends {
 
 if (isNode) {
     module.exports = { Agent };
+} else if (window.LiteSockets) {
+    window.LiteSockets.Agent = Agent;
 } else {
     window.LiteSockets = { Agent };
 }

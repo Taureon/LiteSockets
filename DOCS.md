@@ -60,8 +60,8 @@ The following methods return the immediate next piece of information as if it we
 # Builder
 This constructor takes in no arguments.
 
-The following methods add data to an internal queue.
-They also return the builder itself (unless another return type is specified) to allow method chaining.
+The following methods add data to an internal queue.\
+They also return the builder instance (unless another return type is specified) to allow method chaining.
 
 `.BigInt64` ( `bigInt` )\
 `.BigUint64` ( `bigUint` )\
