@@ -57,7 +57,7 @@ The following methods return the immediate next piece of information as if it we
 `.ArrayRemaining` ( `type`, `...argument` ): `Array`\
 `.Struct` ( `struct` ): `Object`
 
-# Writer
+# Builder
 This constructor takes in no arguments.
 
 The following methods add data to an internal queue.
