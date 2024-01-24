@@ -1,5 +1,13 @@
 let decrypt, encrypt,
-    isNode = typeof module != 'undefined';
+    isNode = typeof module != 'undefined',
+
+makeChecksum = buffer => {
+    let final = 0;
+    for (let i = 0; i < buffer.length; i++) {
+        final ^= buffer[i];
+    }
+    return final;
+},
 
 dictifyStruct = struct => {
     let dict = {};
@@ -37,8 +45,7 @@ if (isNode) {
 } else {
     // TODO: implement this
     // https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/aes-cbc.js
-    encrypt = () => throw new Error("Browser-side cryptography has not been implemented yet!");
-    decrypt = () => throw new Error("Browser-side cryptography has not been implemented yet!");
+    encrypt = decrypt = () => throw new Error("Browser-side cryptography has not been implemented yet!");
 }
 
 class Agent extends {
@@ -49,12 +56,12 @@ class Agent extends {
         this.key = key;
         this.ivLength = ivLength;
 
-        this.structsReceive_MapIdToName = structsReceive.map(([x], i) => [i, x]);
-        this.structsSend_MapNameToId = Object.fromEntries(structsSend.map(([x], i) => [x, i]));
+        this.structsReceive_mapIdToName = structsReceive.map(([x], i) => [i, x]);
+        this.structsSend_mapNameToId = Object.fromEntries(structsSend.map(([x], i) => [x, i]));
 
+        this.connection.binaryType = 'arraybuffer';
         this.connection.onopen = event => this.emit('open', event);
         this.connection.onmessage = msg => {
-
             let message = new Uint8Array(msg.data);
 
             if (this.key) {
@@ -63,7 +70,7 @@ class Agent extends {
 
             message = new Reader(message.buffer);
 
-            let id = this.structsReceive_MapIdToName[message.Uint8()];
+            let id = this.structsReceive_mapIdToName[message.Uint8()];
 
             this.emit(id, this.parse(id, message));
         };
@@ -72,27 +79,33 @@ class Agent extends {
     }
 
     serialise (id, data) {
-        let builder = new Builder(),
-            [type, ...argument] = this.structsSend[id];
-        builder.Uint8(this.structsSend_MapNameToId[id]);
-        builder[type](data, ...argument);
-        return builder.finish();
+        let [type, ...argument] = this.structsSend[id];
+
+        return new Builder()
+            .Uint8(this.structsSend_mapNameToId[id])
+            [type](data, ...argument) // 500 iq method chaining
+            .finish();
     }
     parse (id, reader) {
         let [type, ...argument] = this.structsReceive[id];
         return reader[type](...argument);
     }
 
-    decrypt (buffer) {
-        // decrypt buffer
-        // get checksum
-        // cry if checksum bad
-        // return
-    }
     encrypt (buffer) {
-        // add checksum
-        // encrypt buffer
-        // return
+        return encrypt(
+            new Builder()
+                .Uint8(makeChecksum(buffer))
+                .Buffer(buffer),
+        this.key, this.ivLength);
+    }
+    decrypt (buffer) {
+        let reader = new Reader(decrypt(buffer, this.key, this.ivLength)),
+            checksum = reader.Uint8();
+        buffer = reader.BufferRemaining();
+        if (checksum == makeChecksum(buffer)) {
+            throw new Error("Decrypted checksum mismatch!");
+        }
+        return buffer;
     }
 
     send (id, data) {

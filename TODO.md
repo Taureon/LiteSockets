@@ -2,3 +2,4 @@
 - Add error checking to Agent, Client and Server.
 - Add browser-side encryption.
 - Add more testing.
+- Validate structs.
