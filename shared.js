@@ -104,7 +104,7 @@ class Agent extends {
 
     encrypt (buffer) {
         if (!this.key) {
-            return new Promise(R => R(buffer));
+            return new Promise(Resolve => Resolve(buffer));
         }
 
         return encrypt(
@@ -116,7 +116,7 @@ class Agent extends {
 
     async decrypt (buffer) {
         if (!this.key) {
-            return new Promise(R => R(buffer));
+            return new Promise(Resolve => Resolve(buffer));
         }
 
         let reader = new Reader(await decrypt(buffer, this.key, this.ivLength)),
