@@ -20,32 +20,42 @@ dictifyStruct = struct => {
 if (isNode) {
     let crypto = require('crypto');
 
-    encrypt = (buffer, key, ivLength) => {
+    encrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let iv = crypto.randomBytes(ivLength),
             cipher = crypto.createCipheriv('aes-256-cbc', key, iv),
             encrypted = cipher.update(buffer);
 
-        return new Builder()
+        Resolve(new Builder()
             .Buffer(iv)
             .Buffer(encrypted)
             .Buffer(cipher.final())
-            .finish();
-    };
+            .finish()
+        );
+    });
 
-    decrypt = (buffer, key, ivLength) => {
+    decrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let reader = new Reader(buffer),
             decipher = crypto.createDecipheriv('aes-256-cbc', key, reader.Buffer(ivLength)),
             decrypted = decipher.update(reader.BufferRemaining());
 
-        return new Builder()
+        Resolve(new Builder()
             .Buffer(decrypted)
             .Buffer(decipher.final())
-            .finish();
-    };
+            .finish()
+        );
+    });
 } else {
-    // TODO: implement this
-    // https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/aes-cbc.js
-    encrypt = decrypt = () => throw new Error("Browser-side cryptography has not been implemented yet!");
+    let crypto = window.crypto;
+
+    encrypt = async (buffer, key, ivLength) => new Promise(Resolve => {
+        let iv = crypto.getRandomValues(new Uint8Array(ivLength));
+        crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, buffer).then(encrypted => Resolve(new Builder() .Buffer(iv) .Buffer(encrypted) .finish() ));
+    });
+
+    decrypt = async (buffer, key, ivLength) => new Promise(Resolve => {
+        let reader = new Reader(buffer);
+        crypto.subtle.decrypt({ name: "AES-CBC", iv: reader.Buffer(ivLength) }, key, reader.BufferRemaining()).then(Resolve);
+    });
 }
 
 class Agent extends {
@@ -56,23 +66,23 @@ class Agent extends {
         this.key = key;
         this.ivLength = ivLength;
 
+        if (this.key && !isNode) {
+            window.crypto.subtle.importKey('raw', this.key, 'AES-CBC', false, ['encrypt', 'decrypt']).then(key => this.key = key);
+        }
+
         this.structsReceive_mapIdToName = structsReceive.map(([x], i) => [i, x]);
         this.structsSend_mapNameToId = Object.fromEntries(structsSend.map(([x], i) => [x, i]));
 
         this.connection.binaryType = 'arraybuffer';
         this.connection.onopen = event => this.emit('open', event);
         this.connection.onmessage = msg => {
-            let message = new Uint8Array(msg.data);
+            this.decrypt(msg.data).then(result => {
 
-            if (this.key) {
-                message = this.decrypt(message);
-            }
+                let message = new Reader(result.buffer),
+                    id = this.structsReceive_mapIdToName[message.Uint8()];
 
-            message = new Reader(message.buffer);
-
-            let id = this.structsReceive_mapIdToName[message.Uint8()];
-
-            this.emit(id, this.parse(id, message));
+                this.emit(id, this.parse(id, message));
+            });
         };
         this.connection.onerror = event => this.emit('error', event);
         this.connection.onclose = event => this.emit('close', event);
@@ -86,20 +96,30 @@ class Agent extends {
             [type](data, ...argument) // 500 iq method chaining
             .finish();
     }
+
     parse (id, reader) {
         let [type, ...argument] = this.structsReceive[id];
         return reader[type](...argument);
     }
 
     encrypt (buffer) {
+        if (!this.key) {
+            return new Promise(R => R(buffer));
+        }
+
         return encrypt(
             new Builder()
                 .Uint8(makeChecksum(buffer))
                 .Buffer(buffer),
         this.key, this.ivLength);
     }
-    decrypt (buffer) {
-        let reader = new Reader(decrypt(buffer, this.key, this.ivLength)),
+
+    async decrypt (buffer) {
+        if (!this.key) {
+            return new Promise(R => R(buffer));
+        }
+
+        let reader = new Reader(await decrypt(buffer, this.key, this.ivLength)),
             checksum = reader.Uint8();
         buffer = reader.BufferRemaining();
         if (checksum == makeChecksum(buffer)) {
@@ -111,13 +131,8 @@ class Agent extends {
     send (id, data) {
         if (this.socket.readyState !== webSocket.OPEN) return;
 
-        let buffer = this.serialise(id, data);
-
-        if (this.key) {
-            buffer = this.encrypt(buffer);
-        }
-
-        this.connection.send(buffer);
+        this.encrypt(this.serialise(id, data))
+            .then(buffer => this.connection.send(buffer));
     }
 
     close (code, reason) {

@@ -1,5 +1,4 @@
 - Resolve the question of which Bitfield to use. (possibly use a bitwalker?)
 - Add error checking to Agent, Client and Server.
-- Add browser-side encryption.
 - Add more testing.
 - Validate structs.
