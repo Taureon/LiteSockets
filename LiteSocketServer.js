@@ -54,6 +54,10 @@ class LiteSocketServer extends EventEmitter {
             }
         }
     }
+
+    close (...args) {
+        this.server.close(...args);
+    }
 }
 
 if (module) {
