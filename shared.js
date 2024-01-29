@@ -1,4 +1,4 @@
-let decrypt, encrypt, EventEmitter
+let decrypt, encrypt, EventEmitter,
     isNode = typeof module != 'undefined',
 
 makeChecksum = buffer => {
