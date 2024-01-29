@@ -1,4 +1,4 @@
-let decrypt, encrypt,
+let decrypt, encrypt, EventEmitter
     isNode = typeof module != 'undefined',
 
 makeChecksum = buffer => {
@@ -19,6 +19,8 @@ dictifyStruct = struct => {
 
 if (isNode) {
     let crypto = require('crypto');
+
+    EventEmitter = require('events');
 
     encrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let iv = crypto.randomBytes(ivLength),
@@ -56,9 +58,22 @@ if (isNode) {
         let reader = new Reader(buffer);
         crypto.subtle.decrypt({ name: "AES-CBC", iv: reader.Buffer(ivLength) }, key, reader.BufferRemaining()).then(Resolve);
     });
+
+    EventEmitter = class {
+        constructor () {
+            this.callbacks = {};
+        }
+        on (event, callback) {
+            if (!this.callbacks[event]) this.callbacks[event] = [];
+            this.callbacks[event].push(callback);
+        }
+        emit (event, ...data) {
+            if (this.callbacks[event]) for (let i = 0; i < this.callbacks[event].length; i++) this.callbacks[event][i](...data);
+        }
+    };
 }
 
-class Agent extends {
+class Agent extends EventEmitter {
     constructor ({ connection, structsReceive, structsSend, key, ivLength = 12 }) {
         this.connection = connection;
         this.structsReceive = dictifyStruct(structsReceive);
