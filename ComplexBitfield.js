@@ -1,6 +1,6 @@
-class Bitmap {
+class ComplexBitfield {
     //Why can't we do private instance variables like in Java :(
-    //TODO: allow for loading in pre-existing bitmap schema with static allocations - new Bitmap().useSchema(schema)
+    //TODO: allow for loading in pre-existing bitmap schema with static allocations - new ComplexBitfield().useSchema(schema)
     constructor() {
         this.fields = []
         for (let i = 0; i < arguments.length; i++) {
@@ -21,7 +21,7 @@ class Bitmap {
                 break;
             case "object":
                 if (!field.name) {
-                    throw new BitmapError("Bitmap field must have a name");
+                    throw new ComplexBitfieldError("Bitfield field must have a name");
                 }
                 this.fields[field.name] = {
                     value: field.value || null,
@@ -30,7 +30,7 @@ class Bitmap {
                 };
                 break;
             default:
-                throw new BitmapError("Invalid bitmap field type");
+                throw new ComplexBitfieldError("Invalid bitmap field type");
         }
     }
     set(field, value) {
@@ -81,13 +81,13 @@ class Bitmap {
     }
 }
 
-class BitmapError extends Error {
+class ComplexBitfieldError extends Error {
     constructor(message) {
         super(message);
         this.message = message;
     }
 }
-BitmapError.prototype.name = 'BitmapError';
+ComplexBitfieldError.prototype.name = 'ComplexBitfieldError';
 
-if (typeof module !== 'undefined') module.exports = Bitmap;
-else window.Bitmap = Bitmap;
+if (typeof module !== 'undefined') module.exports = ComplexBitfield;
+else window.ComplexBitfield = ComplexBitfield;

@@ -1,7 +1,7 @@
 /* jshint esversion: 11 */
-let { WebSocketServer } = require('ws'),
-    EventEmitter = require('events'),
-    Agent = require('./shared.js').Agent;
+import { WebSocketServer } from 'ws';
+import { EventEmitter } from 'events';
+import { Agent } from './shared.js';
 
 class SocketWrap extends Agent {
     constructor (wsSocket, lsServer) {
@@ -15,7 +15,7 @@ class SocketWrap extends Agent {
     }
 }
 
-class LiteSocketServer extends EventEmitter {
+class Server extends EventEmitter {
     constructor(args) {
         if ('object' != typeof args) {
             throw new Error("First argument is not an object!");
@@ -60,8 +60,7 @@ class LiteSocketServer extends EventEmitter {
     }
 }
 
-if (module) {
-    module.exports = { Server: LiteSocketServer };
-} else {
+if (!module) {
     throw new LiteSocketError('Where are you trying to run this server in? This was made for Node.js');
 }
+export { Server };

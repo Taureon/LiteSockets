@@ -1,6 +1,6 @@
 /* jshint esversion: 11 */
-let webSocket = WebSocket || require('ws'),
-    Agent = window?.LiteSockets?.Agent || require('./shared.js').Agent;
+import { Agent } from './shared.js';
+let webSocket = WebSocket ?? import('ws');
 
 invalidateWebSocketURL = url => {
     try {
@@ -11,7 +11,7 @@ invalidateWebSocketURL = url => {
     }
 };
 
-class LiteSocketClient extends Agent {
+class Client extends Agent {
     constructor (args) {
         if ('object' != typeof args) {
             throw new Error("First argument is not an object!");
@@ -32,10 +32,4 @@ class LiteSocketClient extends Agent {
     }
 }
 
-if (typeof module != "undefined") {
-    module.exports = { Client };
-} else if (window.LiteSockets) {
-    window.LiteSockets.Client = Client;
-} else {
-    window.LiteSockets = { Client };
-}
+export { Client };

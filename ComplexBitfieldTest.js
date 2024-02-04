@@ -1,4 +1,4 @@
-const Bitmap = require("./bitmap.js")
+const Bitmap = require("./ComplexBitfield.js")
 
 //Note: plz don't try and set properties using `bitmap.fields[fieldName]`, it will break things
 //Will try and resolve this later but for now just don't do that

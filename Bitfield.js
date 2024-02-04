@@ -1,8 +1,6 @@
-class Bitmap {
-	constructor (...args) {
-		this.store = 0n;
-
-		let fields = args.flat();
+class Bitfield {
+	constructor (fields, init = 0n) {
+		this.store = init;
 		this.fields = {};
 		for (let i = 0n; i < fields.length; i++) {
 			this.fields[fields[i]] = i;
@@ -27,5 +25,4 @@ class Bitmap {
 	}
 }
 
-if (typeof module !== 'undefined') module.exports = Bitmap;
-else window.Bitmap = Bitmap;
+export { Bitfield };

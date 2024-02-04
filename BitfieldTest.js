@@ -16,4 +16,4 @@ activeEffects.set("SPEED", true);
 console.log('');
 activeEffects.forEach((field, isTrue) => console.log(field, isTrue));
 
-console.log('\n' + activeEffects.store.toString(2).padStart(6, '0'), activeEffects.store);
+console.log('\n' + activeEffects.store.toString(2).padStart(effects.length, '0'), activeEffects.store);
