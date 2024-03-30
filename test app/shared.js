@@ -2,7 +2,10 @@
 // but it makes it very easy to keep server and client packets
 // synced if you want to change/add/remove something.
 
-
+// You can use variables to make sure the data type for something stays consistent
+const teamId = 'Uint16',
+    name = 'String8',
+    content = 'String';
 
 // Packages, that the Client sends to the Server
 let clientPackages = [
@@ -12,20 +15,16 @@ let clientPackages = [
     ['ping'],
 
     // clients and servers keep track of the "lobbies" (different channels in the chat) via 16 bit IDs
-    ['switchLobby', 'Uint16'],
+    ['switchTeam', teamId],
 
     // clients can set their names literally whenever
-    ['setName', 'String8'],
+    ['setName', name],
 
-    // clients can send chat messages to their current lobby
-    ['sendMessage', 'String8'],
+    // clients can send chat messages to everyone
+    ['sendMessage', content],
 
-    // clients can also send small files over chat to others in the channel
-    // those files only last for a few minutes
-    ['upload', 'Struct', [
-        ['filename', 'String8'],
-        ['filedata', 'Buffer16']
-    ]]
+    // clients can send chat messages to their team
+    ['sendTeamMessage', content]
 ],
 
 // Packages, that the Server sends to the Client
@@ -34,26 +33,18 @@ serverPackages = [
     // if didn't receive this packet for over 15 seconds, timeout kick
     ['pong'],
 
-    // notify a client what their current lobby is
-    ['currentLobby', 'Uint16'],
-
-    // updates the client on how every lobby is going
-    ['status', 'Array16', 'Struct', [
-        ['id', 'Uint16'],
-        ['playerCount', 'Uint16'],
-        ['motd', 'String32']
-    ]],
-
-    // NOTE: finish
+    // send a message
     ['message', 'Struct', [
-        ['name', 'String8'],
-        ['content', 'String8']
+        ['name', name],
+        ['nameColor', 'String8'],
+        ['content', content]
     ]],
 
-    // NOTE: finish
-    ['download', 'Struct', [
-        ['filename', 'String8'],
-        ['filedata', 'Buffer32']
+    // send a message to the team
+    ['teamMessage', 'Struct', [
+        ['name', name],
+        ['nameColor', 'String8'],
+        ['content', content]
     ]]
 ];
 

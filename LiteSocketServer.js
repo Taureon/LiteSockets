@@ -60,7 +60,7 @@ class Server extends EventEmitter {
     }
 }
 
-if (!module) {
+if (typeof window != 'undefined') {
     throw new LiteSocketError('Where are you trying to run this server in? This was made for Node.js');
 }
 export { Server };

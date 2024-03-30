@@ -1,68 +1,109 @@
-import { Server as LSServer } from "LiteSocketServer.js";
-import { clientPackages, serverPackages } from 'shared.js';
+import { existsSync, lstatSync, createReadStream } from 'fs';
+import { createServer } from 'http';
+import { join as joinPaths } from 'path';
 
-// Creates a new server on port 8080
-let server = new LSClient({
-    options: { port: 8080 },
+import { Server as LSServer } from "../LiteSocketServer.js";
+import { clientPackages, serverPackages } from './shared.js';
+
+// Create a new httpServer to be opened on port 8080 later
+let mimeSet = {
+    "js": "application/javascript",
+    "css": "text/css",
+    "html": "text/html"
+},
+httpServer = createServer((req, res) => {
+    let fileToGet = joinPaths(process.cwd(), req.url);
+    console.log(fileToGet);
+
+    //be really persistent about checking if the file exists, and if it doesn't, return index.html instead;
+    if (!existsSync(fileToGet) || !lstatSync(fileToGet).isFile()) {
+        fileToGet = joinPaths(process.cwd(), './index.html');
+    }
+
+    //return the file
+    console.log(fileToGet.split('.'));
+    res.writeHead(200, { 'Content-Type': mimeSet[ fileToGet.split('.').pop() ] || 'text/html' });
+    createReadStream(fileToGet).pipe(res);
+}),
+
+lsServer = new LSServer({
+    options: { server: httpServer },
     serverPackages,
     clientPackages
 });
 
+function serverChatMessage(content) {
+    lsServer.broadcast('message', { name: 'Server', nameColor: '#ffff00', content });
+}
+
 // Someone has connected! Let's let them join the chat room!
-server.on('connection', (req, socket) => {
+lsServer.on('connection', (req, socket) => {
+    
+    // You can also just add custom things to the socket.
+    socket.lastPingTime = Date.now();
 
     // Everyone will be called Anonymousrandomnumbers
-    const username = 'Anonymous' + Math.random().toString().slice(2);
+    socket.username = 'Anonymous' + Math.random().toString().slice(2);
+    socket.usernameColor = ('#' + Math.floor(Math.random() * 16777216)).padEnd(7, '0');
+    socket.teamId = 0;
 
     // Send a nice welcome message :D
-    socket.send('message', {
-        name: 'Server',
-        content: `hello ${username}!`
+    serverChatMessage(`A new user called ${username} has joined!`);
+    lsServer.broadcast('message', { name: 'Server', nameColor: '#ffff00', content: 'Commands: /setTeam, /team, /setName' });
+
+    socket.on('ping', () => {
+        socket.lastPingTime = Date.now();
+        socket.send('pong');
     });
 
-    // They are uploading a file to other people in the chatroom
-    socket.on('upload', upload => {
+    socket.on('setTeam', teamId => {
+        let oldTeamId = socket.teamId;
+        socket.teamId = teamId;
+        serverChatMessage(`${socket.name} changed team from ${oldTeamId} to ${teamId}`);
+    });
 
-        // Turn dangerous files into text files
-        let fn = upload.filename.split('.');
-        if (['exe', 'scr', 'bat', 'ps1'].includes(fn[fn.length - 1])) {
-            fn[fn.length - 1] = 'txt';
-        }
-
-        // Send file to everyone else
-        server.broadcast('download', {
-            filename: fn.join('.'),
-            filedata: upload.filedata
-        });
+    socket.on('setName', newName => {
+        let oldName = socket.username;
+        socket.username = newName;
+        serverChatMessage(`${oldName} from team ${socket.teamId} changed name to ${newName}`);
     });
 
     // They wanna say something
-    socket.on('message', msg => {
+    socket.on('sendMessage', msg => {
 
         // Filter out bad words
-        if (msg.content.includes('bad words')) return;
+        if (msg.includes('bad words')) return;
 
         // Broadcast message to everyone else
-        server.broadcast('message', {
-            name: username,
-            content: msg.content
+        lsServer.broadcast('message', {
+            name: socket.username,
+            nameColor: socket.usernameColor,
+            content: msg
         });
+    });
+
+    // They wanna say something secretly
+    socket.on('sendTeamMessage', msg => {
+
+        // Filter out bad words
+        if (msg.includes('bad words')) return;
+
+        // Broadcast message to everyone else *on the team*
+        lsServer.broadcast('teamMessage', {
+            name: socket.username,
+            nameColor: socket.usernameColor,
+            content: msg
+        }, s => s.teamId == socket.teamId);
     });
 });
 
-const bootup = Date.now(),
-    format = x => Math.floor(x).toString().padStart(2, '0');
-
-// Update server status once a second
+//kick people who have not responded with a ping packet for 15 seconds
 setInterval(() => {
-    let secs = (Date.now() - bootup) / 1000,
-        mins = secs / 60,
-        hours = mins / 60,
-        timestring = `${format(hours)} hours, ${format(mins % 60)} minutes and ${format(secs % 60)} seconds`;
-
-    server.broadcast('status', {
-        playerCount: server.sockets.length,
-        motd: `Running for ${timestring}!`
-    });
-
+    for (let socket of lsServer.sockets) {
+        if (Date.now() - socket.lastPingTime > 15_000) {
+            socket.close();
+        }
+    }
 }, 1000);
+
+httpServer.listen(8080, () => console.log('listening on port 8080'));

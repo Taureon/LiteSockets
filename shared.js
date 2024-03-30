@@ -1,5 +1,6 @@
 let decrypt, encrypt, EventEmitter,
-    isNode = typeof module != 'undefined',
+    isNode = typeof window == 'undefined',
+    crypto = isNode ? await import('crypto') : window.crypto,
 
 makeChecksum = buffer => {
     let final = 0;
@@ -18,9 +19,7 @@ dictifyStruct = struct => {
 };
 
 if (isNode) {
-    let crypto = require('crypto');
-
-    EventEmitter = require('events');
+    EventEmitter = (await import('events')).EventEmitter;
 
     encrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let iv = crypto.randomBytes(ivLength),
@@ -46,9 +45,8 @@ if (isNode) {
             .finish()
         );
     });
-} else {
-    let crypto = window.crypto;
 
+} else {
     encrypt = async (buffer, key, ivLength) => new Promise(Resolve => {
         let iv = crypto.getRandomValues(new Uint8Array(ivLength));
         crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, buffer).then(encrypted => Resolve(new Builder() .Buffer(iv) .Buffer(encrypted) .finish() ));
@@ -155,10 +153,4 @@ class Agent extends EventEmitter {
     }
 }
 
-if (isNode) {
-    module.exports = { Agent };
-} else if (window.LiteSockets) {
-    window.LiteSockets.Agent = Agent;
-} else {
-    window.LiteSockets = { Agent };
-}
+export { Agent };

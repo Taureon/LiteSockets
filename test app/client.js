@@ -1,56 +1,59 @@
-import { Client as LSClient } from 'LiteSocketClient.js';
-import { clientPackages, serverPackages } from 'shared.js';
+import { Client as LSClient } from './LiteSocketClient.js';
+import { clientPackages, serverPackages } from './test app/shared.js';
 
-// Create new client that connects with 'wss://example.com/'
-let client = new LSClient({
+
+const chatBox = document.getElementById('chatBox'),
+    messageHistory = document.getElementById('messageHistory'),
+
+client = new LSClient({
     url: 'wss://example.com/',
     serverPackages,
     clientPackages
 });
 
-// We have connected, so we have to open chat and immediately send a message
 client.on('open', event => {
-    openChat();
-
-    client.send('message', {
-        content: 'This is an example message!'
-    });
+    newMessage(['#0000ff', 'connected to the server']);
+    client.send('ping');
 });
 
-client.on('status', status => {
-    updateMOTDText(status.motd);
-    updatePlayerCountNumber(status.playerCount);
-    updatePlayerCountColor(status.playerCount > 16 ? 'red' : 'yellow');
+client.on('pong', () => {
+    client.send('ping');
 });
 
 client.on('message', message => {
-    console.log(`message received!\n${message.name}\n${message.content}`)
-    addMessageToChat(message);
+    newMessage([message.nameColor, message.name], ['#ffffff', ': ' + message.content]);
 });
 
-client.on('download', download => {
-    let file = new File(download.filedata, download.filename);
-    downloadFile(file);
+client.on('teamMessage', message => {
+    newMessage(['#ffffff', '[team]'], [message.nameColor, message.name], ['#ffffff', ': ' + message.content]);
 });
 
 client.on('close', event => {
-    closeChat();
+    newMessage(['#0000ff', 'disconnected from the server']);
 });
 
-fileUpload.addEventListener('dragenter', event => event.preventDefault());
-fileUpload.addEventListener('dragleave', event => event.preventDefault());
-fileUpload.addEventListener('dragover', event => event.preventDefault());
-fileUpload.addEventListener('drop', event => {
-    event.preventDefault();
-
-    for (let file of [...event.dataTransfer.files]) {
-        file.arrayBuffer().then(buffer => {
-            client.send('upload', {
-                filename: file.name,
-                filedata: buffer
-                // You can also do this:
-                // filedata: new TextEncoder().encode('This is a text file!')
-            });
-        });
+function newMessage(...messageData) {
+    let message = document.createElement('p');
+    for (let [color, text] of messageData) {
+        let segment = document.createElement('span');
+        segment.style.color = color;
+        segment.textContent = text;
+        message.append(segment);
     }
+    messageHistory.append(message);
+    return message;
+}
+
+chatBox.addEventListener('keydown', event => {
+    if (!['Enter', 'Escape'].includes(event.key) || !chatBox.value) {
+        return;
+    }
+    if (event.key === 'Enter') {
+        if (chatBox.value.startsWith('/team ')) {
+            client.send('sendTeamMessage', chatBox.value.slice(6));
+        } else {
+            client.send('sendMessage', chatBox.value);
+        }
+    }
+    chatBox.value = "";
 });
