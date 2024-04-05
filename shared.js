@@ -153,4 +153,18 @@ class Agent extends EventEmitter {
     }
 }
 
-export { Agent };
+import { Server } from './LiteSocketServer.js';
+
+class SocketWrapper extends Agent {
+    constructor (wsSocket, lsServer) {
+        super({
+            connection: wsSocket,
+            structsReceive: lsServer.clientPackages,
+            structsSend: lsServer.serverPackages,
+            key: lsServer.key
+        });
+        this.server = lsServer instanceof Server ? lsServer : null;
+    }
+}
+
+export { Agent, SocketWrapper };

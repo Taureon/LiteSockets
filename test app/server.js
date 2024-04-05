@@ -1,32 +1,32 @@
-import { existsSync, lstatSync, createReadStream } from 'fs';
+import { existsSync, createReadStream } from 'fs';
 import { createServer } from 'http';
 import { join as joinPaths } from 'path';
 
-import { Server as LSServer } from "../LiteSocketServer.js";
-import { clientPackages, serverPackages } from './shared.js';
+import { Server } from '../LiteSockets.js';
+import { clientPackages, serverPackages } from './packageSpecs.js';
 
-// Create a new httpServer to be opened on port 8080 later
 let mimeSet = {
     "js": "application/javascript",
     "css": "text/css",
     "html": "text/html"
 },
-httpServer = createServer((req, res) => {
-    let fileToGet = joinPaths(process.cwd(), req.url);
-    console.log(fileToGet);
 
-    //be really persistent about checking if the file exists, and if it doesn't, return index.html instead;
-    if (!existsSync(fileToGet) || !lstatSync(fileToGet).isFile()) {
-        fileToGet = joinPaths(process.cwd(), './index.html');
+// Create a new httpServer to be opened on port 8080 later
+httpServer = createServer((req, res) => {
+    let fileToGet = joinPaths(process.cwd(), req.url)
+        .replace('test app\\module\\', '');
+
+    //check if the file exists, and if it doesn't, return index.html instead;
+    if (!existsSync(fileToGet) || fileToGet.lastIndexOf('.') < fileToGet.lastIndexOf('\\')) {
+        fileToGet = joinPaths(process.cwd(), '.\\index.html');
     }
 
     //return the file
-    console.log(fileToGet.split('.'));
     res.writeHead(200, { 'Content-Type': mimeSet[ fileToGet.split('.').pop() ] || 'text/html' });
     createReadStream(fileToGet).pipe(res);
 }),
 
-lsServer = new LSServer({
+lsServer = new Server({
     options: { server: httpServer },
     serverPackages,
     clientPackages

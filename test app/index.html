@@ -2,20 +2,12 @@
 	<head>
 		<title>Test Chat App</title>
 		<link rel="stylesheet" href="/style.css" />
-		<script type="module" src="./shared.js"></script>
-		<script type="module" src="./LiteSocketClient.js"></script>
-		<script type="module" src="./test app/shared.js"></script>
-		<script type="module" src="./test app/client.js" defer></script>
 	</head>
 	<body>
 		<div id="messageHistory"></div><br>
 		<input id="chatBox" oninput="" type="text" maxlength=16>
+		<script type="module" src="./module/LiteSockets.js"></script>
+		<script type="module" src="./packageSpecs.js"></script>
+		<script type="module" src="./client.js"></script>
 	</body>
 </html>
-
-<!--
-import the shared
-load client
-do html ui stuff for the text app
-text have multiple channels
--->

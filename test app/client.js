@@ -1,11 +1,10 @@
-import { Client as LSClient } from './LiteSocketClient.js';
-import { clientPackages, serverPackages } from './test app/shared.js';
-
+import { Client } from './module/LiteSocketClient.js';
+import { clientPackages, serverPackages } from './packageSpecs.js';
 
 const chatBox = document.getElementById('chatBox'),
     messageHistory = document.getElementById('messageHistory'),
 
-client = new LSClient({
+client = new Client({
     url: 'wss://example.com/',
     serverPackages,
     clientPackages

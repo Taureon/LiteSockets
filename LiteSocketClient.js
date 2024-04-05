@@ -1,8 +1,9 @@
 /* jshint esversion: 11 */
 import { Agent } from './shared.js';
-let webSocket = WebSocket ?? import('ws');
+let webSocket = typeof WebSocket === 'undefined' ? import('ws') : WebSocket,
 
 invalidateWebSocketURL = url => {
+    console.log(url);
     try {
         url = new URL(url);
         return url.protocol != 'ws' && url.protocol != 'wss';
