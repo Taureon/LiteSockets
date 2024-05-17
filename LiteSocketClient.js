@@ -25,8 +25,8 @@ class Client extends Agent {
 
         super({
             connection: new webSocket(args.url),
-            structsReceive: args.clientPackages,
-            structsSend: args.serverPackages,
+            structsReceive: args.serverPackages,
+            structsSend: args.clientPackages,
             key: args.key
         });
     }

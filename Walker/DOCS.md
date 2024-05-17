@@ -20,7 +20,8 @@ Most don't need `...extra`, but here is a list for the `type`s who do:
 - `Array[N]`\*: Another `type` followed by `...argument`.
 - `Array`: Same as `Array[N]`\*, but with a `length` between the second `type` and `...argument`.
 
-\* Array\[N\] = Array8, Array16, Array32 or Array64
+\* Array\[N\] = Array8, Array16, Array32, Array64 or ArrayRemaining.\
+`type`s with `Remaining` have to be the last in the packet.
 
 # Reader
 This constructor takes in an `ArrayBuffer` as its first and only argument.
@@ -88,6 +89,9 @@ They also return the builder instance (unless another return type is specified) 
 `.Array16` ( `array`, `type`, `...argument` )\
 `.Array32` ( `array`, `type`, `...argument` )\
 `.Array64` ( `array`, `type`, `...argument` )\
+`.BufferRemaining` ( `buffer` )\
+`.StringRemaining` ( `string` )\
+`.ArrayRemaining` ( `array`, `type`, `...argument` )\
 `.Struct` ( `object`, `struct` )
 
 `.finish` ( ): `Uint8Array`\

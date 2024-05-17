@@ -53,6 +53,10 @@ class Builder {
 	Array32 (array, type, ...argument) { this.Int32(array.length); this.Array(array, type, ...argument); return this; }
 	Array64 (array, type, ...argument) { this.BigInt64(BigInt(array.length)); this.Array(array, type, ...argument); return this; }
 
+	BufferRemaining (buffer) { this.Buffer(buffer); }
+	StringRemaining (string) { this.String(string); }
+	ArrayRemaining (array, type, ...argument) { this.Array(array, type, ...argument); }
+
 	Struct (object, struct) {
 		for (let [key, type, ...argument] of struct) {
 			if ('function' != typeof this[type]) throw new Error(`Nonexistant type in struct!\nkey: ${key}\ntype: ${type}\nstruct: ${struct}`);
@@ -89,5 +93,4 @@ class Builder {
 	}
 }
 
-if (typeof module !== 'undefined') module.exports = Builder;
-else window.Builder = Builder;
+export { Builder };

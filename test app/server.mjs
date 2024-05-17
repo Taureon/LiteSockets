@@ -37,7 +37,8 @@ function serverChatMessage(content) {
 }
 
 // Someone has connected! Let's let them join the chat room!
-lsServer.on('connection', (req, socket) => {
+lsServer.on('connection', socket => {
+    console.log('connection');
     
     // You can also just add custom things to the socket.
     socket.lastPingTime = Date.now();
@@ -48,10 +49,11 @@ lsServer.on('connection', (req, socket) => {
     socket.teamId = 0;
 
     // Send a nice welcome message :D
-    serverChatMessage(`A new user called ${username} has joined!`);
+    serverChatMessage(`A new user called ${socket.username} has joined!`);
     lsServer.broadcast('message', { name: 'Server', nameColor: '#ffff00', content: 'Commands: /setTeam, /team, /setName' });
 
     socket.on('ping', () => {
+        console.log('ping', socket.username);
         socket.lastPingTime = Date.now();
         socket.send('pong');
     });
@@ -70,6 +72,7 @@ lsServer.on('connection', (req, socket) => {
 
     // They wanna say something
     socket.on('sendMessage', msg => {
+        console.log(socket.username, ':', msg);
 
         // Filter out bad words
         if (msg.includes('bad words')) return;
@@ -93,7 +96,7 @@ lsServer.on('connection', (req, socket) => {
             name: socket.username,
             nameColor: socket.usernameColor,
             content: msg
-        }, s => s.teamId == socket.teamId);
+        }, s => s.teamId === socket.teamId);
     });
 });
 

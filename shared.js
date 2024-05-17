@@ -1,3 +1,6 @@
+import { Builder } from './Walker/builder.js';
+import { Reader } from './Walker/reader.js';
+
 let decrypt, encrypt, EventEmitter,
     isNode = typeof window == 'undefined',
     crypto = isNode ? await import('crypto') : window.crypto,
@@ -47,14 +50,16 @@ if (isNode) {
     });
 
 } else {
-    encrypt = async (buffer, key, ivLength) => new Promise(Resolve => {
+    encrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let iv = crypto.getRandomValues(new Uint8Array(ivLength));
-        crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, buffer).then(encrypted => Resolve(new Builder() .Buffer(iv) .Buffer(encrypted) .finish() ));
+        crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, buffer)
+            .then(encrypted => Resolve(new Builder() .Buffer(iv) .Buffer(encrypted) .finish() ));
     });
 
-    decrypt = async (buffer, key, ivLength) => new Promise(Resolve => {
+    decrypt = (buffer, key, ivLength) => new Promise(Resolve => {
         let reader = new Reader(buffer);
-        crypto.subtle.decrypt({ name: "AES-CBC", iv: reader.Buffer(ivLength) }, key, reader.BufferRemaining()).then(Resolve);
+        crypto.subtle.decrypt({ name: "AES-CBC", iv: reader.Buffer(ivLength) }, key, reader.BufferRemaining())
+            .then(decrypted => Resolve(decrypted));
     });
 
     EventEmitter = class {
@@ -84,7 +89,7 @@ class Agent extends EventEmitter {
             window.crypto.subtle.importKey('raw', this.key, 'AES-CBC', false, ['encrypt', 'decrypt']).then(key => this.key = key);
         }
 
-        this.structsReceive_mapIdToName = structsReceive.map(([x], i) => [i, x]);
+        this.structsReceive_mapIdToName = Object.fromEntries(structsReceive.map(([x], i) => [i, x]));
         this.structsSend_mapNameToId = Object.fromEntries(structsSend.map(([x], i) => [x, i]));
 
         this.connection.binaryType = 'arraybuffer';
@@ -104,16 +109,24 @@ class Agent extends EventEmitter {
 
     serialise (id, data) {
         let [type, ...argument] = this.structsSend[id];
+        
+        let packet = new Builder();
+        packet.Uint8(this.structsSend_mapNameToId[id]);
+        
+        if (type) {
+            packet[type](data, ...argument);
+        }
 
-        return new Builder()
-            .Uint8(this.structsSend_mapNameToId[id])
-            [type](data, ...argument) // 500 iq method chaining
-            .finish();
+        return packet.finish();
     }
 
     parse (id, reader) {
         let [type, ...argument] = this.structsReceive[id];
-        return reader[type](...argument);
+
+        if (type) {
+            let info = reader[type](...argument);
+            return info;
+        }
     }
 
     encrypt (buffer) {
@@ -130,7 +143,7 @@ class Agent extends EventEmitter {
 
     async decrypt (buffer) {
         if (!this.key) {
-            return new Promise(Resolve => Resolve(buffer));
+            return buffer;
         }
 
         let reader = new Reader(await decrypt(buffer, this.key, this.ivLength)),
@@ -143,7 +156,7 @@ class Agent extends EventEmitter {
     }
 
     send (id, data) {
-        if (this.socket.readyState !== webSocket.OPEN) return;
+        if (this.connection.readyState !== this.connection.OPEN) return;
 
         this.encrypt(this.serialise(id, data))
             .then(buffer => this.connection.send(buffer));
@@ -165,7 +178,7 @@ class SocketWrapper extends Agent {
             key: lsServer.key
         });
         // idk how to check if this is an instanceof Server without circular imports so we just kinda have to trust that it is
-        this.server = server;//lsServer instanceof Server ? lsServer : null;
+        this.server = lsServer;//lsServer instanceof Server ? lsServer : null;
     }
 }
 

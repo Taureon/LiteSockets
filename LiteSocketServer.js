@@ -22,6 +22,8 @@ try {
                                 "\n noServer (must be true)");
             }
             super();
+            this.serverPackages = args.serverPackages;
+            this.clientPackages = args.clientPackages;
 
             this.sockets = [];
             this.server = new WebSocketServer(args.options);
@@ -31,10 +33,10 @@ try {
                 socket.on('close', () => {
                     let i = this.sockets.indexOf(socket);
                     if (i > -1) {
-                        array.splice(i, 1);
+                        this.sockets.splice(i, 1);
                     }
                 });
-                this.emit('connection', req, socket, head);
+                this.emit('connection', socket);
             });
             this.server.on('error', event => this.emit('error', event));
         }

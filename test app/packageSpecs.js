@@ -3,9 +3,9 @@
 // synced if you want to change/add/remove something.
 
 // You can use variables to make sure the data type for something stays consistent
-const teamId = 'Uint16',
-    name = 'String8',
-    content = 'String';
+const teamIdType = 'Uint16',
+    nameType = 'String8',
+    contentType = 'StringRemaining';
 
 // Packages, that the Client sends to the Server
 let clientPackages = [
@@ -15,16 +15,16 @@ let clientPackages = [
     ['ping'],
 
     // clients and servers keep track of the "lobbies" (different channels in the chat) via 16 bit IDs
-    ['switchTeam', teamId],
+    ['switchTeam', teamIdType],
 
     // clients can set their names literally whenever
-    ['setName', name],
+    ['setName', nameType],
 
     // clients can send chat messages to everyone
-    ['sendMessage', content],
+    ['sendMessage', contentType],
 
     // clients can send chat messages to their team
-    ['sendTeamMessage', content]
+    ['sendTeamMessage', contentType]
 ],
 
 // Packages, that the Server sends to the Client
@@ -35,16 +35,16 @@ serverPackages = [
 
     // send a message
     ['message', 'Struct', [
-        ['name', name],
+        ['name', nameType],
         ['nameColor', 'String8'],
-        ['content', content]
+        ['content', contentType]
     ]],
 
     // send a message to the team
     ['teamMessage', 'Struct', [
-        ['name', name],
+        ['name', nameType],
         ['nameColor', 'String8'],
-        ['content', content]
+        ['content', contentType]
     ]]
 ];
 

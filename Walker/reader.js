@@ -6,11 +6,13 @@ class Reader {
 		this.dataView = new DataView(buffer);
 		this.index = 0;
 	}
+	get hasLeftovers () {
+		return this.index < this.buffer.length;
+	}
 	Index (n) {
-		let toWalk = parseInt(n);
-		if (isNaN(toWalk)) throw new Error(`Trying to walk a non-integer amount!\nto walk: ${toWalk}`);
+		if (parseInt(n) !== n) throw new Error(`Trying to walk a non-integer amount!\nto walk: ${n}`);
 		let old = this.index;
-		this.index += toWalk;
+		this.index += n;
 		if (this.index > this.buffer.length) throw new Error('Walked past the buffer length!');
 		return old;
 	}
@@ -52,7 +54,7 @@ class Reader {
 	Array32 (type, ...argument) { return this.Array(type, this.Uint32(), ...argument); }
 	Array64 (type, ...argument) { return this.Array(type, this.BigUint64(), ...argument); }
 
-	BufferRemaining () { return this.buffer.slice(this.Index(length - this.index), this.index); }
+	BufferRemaining () { return this.buffer.slice(this.index, this.buffer.length); }
 	StringRemaining () { return textDecoder.decode(this.BufferRemaining()); }
 
 	ArrayRemaining (type, ...argument) {
@@ -74,5 +76,4 @@ class Reader {
 	}
 }
 
-if (typeof module !== 'undefined') module.exports = Reader;
-else window.Reader = Reader;
+export { Reader };
