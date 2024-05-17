@@ -2,8 +2,8 @@ let textDecoder = new TextDecoder();
 
 class Reader {
 	constructor (buffer) {
-		this.buffer = buffer;
-		this.dataView = new DataView(buffer);
+		this.buffer = buffer instanceof ArrayBuffer ? buffer : buffer.buffer;
+		this.dataView = new DataView(this.buffer);
 		this.index = 0;
 	}
 	get hasLeftovers () {

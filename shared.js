@@ -97,7 +97,7 @@ class Agent extends EventEmitter {
         this.connection.onmessage = msg => {
             this.decrypt(msg.data).then(result => {
 
-                let message = new Reader(result.buffer),
+                let message = new Reader(result),
                     id = this.structsReceive_mapIdToName[message.Uint8()];
 
                 this.emit(id, this.parse(id, message));

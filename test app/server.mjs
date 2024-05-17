@@ -44,16 +44,16 @@ lsServer.on('connection', socket => {
     socket.lastPingTime = Date.now();
 
     // Everyone will be called Anonymousrandomnumbers
-    socket.username = 'Anonymous' + Math.random().toString().slice(2);
-    socket.usernameColor = ('#' + Math.floor(Math.random() * 16777216)).padEnd(7, '0');
+    socket.username = 'Anonymous' + Math.random().toString().slice(2, 6);
+    socket.usernameColor = ('#' + Math.floor(Math.random() * 16777216).toString(16)).padEnd(7, '0');
+    console.log(socket.usernameColor);
     socket.teamId = 0;
 
     // Send a nice welcome message :D
     serverChatMessage(`A new user called ${socket.username} has joined!`);
-    lsServer.broadcast('message', { name: 'Server', nameColor: '#ffff00', content: 'Commands: /setTeam, /team, /setName' });
+    socket.send('message', { name: 'Server', nameColor: '#ffff00', content: 'Commands: /setTeam, /team, /setName' });
 
     socket.on('ping', () => {
-        console.log('ping', socket.username);
         socket.lastPingTime = Date.now();
         socket.send('pong');
     });
@@ -98,6 +98,10 @@ lsServer.on('connection', socket => {
             content: msg
         }, s => s.teamId === socket.teamId);
     });
+
+    socket.on('close', () => {
+        serverChatMessage(`${socket.username} has left!`);
+    })
 });
 
 //kick people who have not responded with a ping packet for 15 seconds

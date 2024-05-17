@@ -11,7 +11,7 @@ client = new Client({
 });
 
 client.on('open', event => {
-    newMessage(['#0000ff', 'connected to the server']);
+    newMessage(['#8888ff', 'connected to the server']);
     client.send('ping');
 });
 
@@ -24,11 +24,11 @@ client.on('message', message => {
 });
 
 client.on('teamMessage', message => {
-    newMessage(['#ffffff', '[team]'], [message.nameColor, message.name], ['#ffffff', ': ' + message.content]);
+    newMessage(['#ffffff', '[team] '], [message.nameColor, message.name], ['#ffffff', ': ' + message.content]);
 });
 
 client.on('close', event => {
-    newMessage(['#0000ff', 'disconnected from the server']);
+    newMessage(['#8888ff', 'disconnected from the server']);
 });
 
 function newMessage(...messageData) {
