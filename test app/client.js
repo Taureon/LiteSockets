@@ -5,7 +5,7 @@ const chatBox = document.getElementById('chatBox'),
     messageHistory = document.getElementById('messageHistory'),
 
 client = new Client({
-    url: 'wss://example.com/',
+    url: 'wss://localhost:8080/',
     serverPackages,
     clientPackages
 });

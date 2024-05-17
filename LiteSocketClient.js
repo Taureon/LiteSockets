@@ -3,10 +3,9 @@ import { Agent } from './shared.js';
 let webSocket = typeof WebSocket === 'undefined' ? import('ws') : WebSocket,
 
 invalidateWebSocketURL = url => {
-    console.log(url);
     try {
         url = new URL(url);
-        return url.protocol != 'ws' && url.protocol != 'wss';
+        return url.protocol != 'ws:' && url.protocol != 'wss:';
     } catch (err) {
         return true;
     }

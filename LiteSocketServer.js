@@ -1,8 +1,9 @@
 let Server;
 
 // this is unbelievably stupid
+// we are basically acting like we are in a server environment and if something rightfully throws an error, it means we arent
 try {
-    let { Agent, SocketWrapper }  = await import('./shared.js'),
+    let { SocketWrapper } = await import('./shared.js'),
         { WebSocketServer } = await import('ws'),
         { EventEmitter } = await import('events');
 

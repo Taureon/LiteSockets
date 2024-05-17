@@ -73,6 +73,7 @@ if (isNode) {
 
 class Agent extends EventEmitter {
     constructor ({ connection, structsReceive, structsSend, key, ivLength = 12 }) {
+        super();
         this.connection = connection;
         this.structsReceive = dictifyStruct(structsReceive);
         this.structsSend = dictifyStruct(structsSend);
@@ -135,7 +136,7 @@ class Agent extends EventEmitter {
         let reader = new Reader(await decrypt(buffer, this.key, this.ivLength)),
             checksum = reader.Uint8();
         buffer = reader.BufferRemaining();
-        if (checksum == makeChecksum(buffer)) {
+        if (checksum === makeChecksum(buffer)) {
             throw new Error("Decrypted checksum mismatch!");
         }
         return buffer;
@@ -153,7 +154,7 @@ class Agent extends EventEmitter {
     }
 }
 
-import { Server } from './LiteSocketServer.js';
+// import { Server } from './LiteSocketServer.js';
 
 class SocketWrapper extends Agent {
     constructor (wsSocket, lsServer) {
@@ -163,7 +164,8 @@ class SocketWrapper extends Agent {
             structsSend: lsServer.serverPackages,
             key: lsServer.key
         });
-        this.server = lsServer instanceof Server ? lsServer : null;
+        // idk how to check if this is an instanceof Server without circular imports so we just kinda have to trust that it is
+        this.server = server;//lsServer instanceof Server ? lsServer : null;
     }
 }
 
