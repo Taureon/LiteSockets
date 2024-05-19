@@ -13,12 +13,15 @@ let mimeSet = {
 
 // Create a new httpServer to be opened on port 8080 later
 httpServer = createServer((req, res) => {
+    let slashType = process.cwd().includes("\\") ? "\\" : "/";
+    let fixPath = (path) => path.replaceAll("\\", slashType);
+
     let fileToGet = joinPaths(process.cwd(), req.url)
-        .replace('test app\\module\\', '');
+        .replace(fixPath('test app\\module\\'), '');
 
     //check if the file exists, and if it doesn't, return index.html instead;
-    if (!existsSync(fileToGet) || fileToGet.lastIndexOf('.') < fileToGet.lastIndexOf('\\')) {
-        fileToGet = joinPaths(process.cwd(), '.\\index.html');
+    if (!existsSync(fileToGet) || fileToGet.lastIndexOf('.') < fileToGet.lastIndexOf(fixPath('\\'))) {
+        fileToGet = joinPaths(process.cwd(), fixPath('.\\index.html'));
     }
 
     //return the file
