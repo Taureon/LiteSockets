@@ -11,6 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/Taureon/LiteSockets.git"
   },
+  "dependencies": {
+    "ws": "^8.13.0"
+  },
   "keywords": [
     "WebSocket",
     "WebSockets",
