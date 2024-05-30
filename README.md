@@ -1,3 +1,7 @@
+# WE MIGRATED
+[CHECK OUT THE CODEBERG REPOSITORY HERE](https://codeberg.org/Taureon/LiteSockets/)
+IT IS KEPT UP TO DATE, BUT THE GITHUB MIRROR IS NOT.
+
 # LiteSockets
 ## Easy Low level Websockets!
 
